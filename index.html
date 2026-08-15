@@ -435,21 +435,25 @@ function updateTotalAuraUI() {
 
 /* Логіка Таблиці Лідерів */
 const baseBotsList = [
-  { name: "Gigachad 👑", aura: 250000 },
-  { name: "Aura King ⚡", aura: 120000 },
-  { name: "Sigma Bot 🗿", aura: 65000 },
-  { name: "Phonk Enjoyer 🎧", aura: 32000 },
-  { name: "Default NPC 🤖", aura: 1200 }
+  { name: "duck228", aura: 256752 },
+  { name: "CORLIX", aura: 127658 },
+  { name: "B1RD", aura: 65732 },
+  { name: "GON-Donk666", aura: 321057 },
+  { name: "burns", aura: 1267 }
 ];
 
 function openLeaderboard() {
   const modal = document.getElementById('leaderboard-modal');
   const listContainer = document.getElementById('leaderboard-list');
   listContainer.innerHTML = '';
+  
+let tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+let playerName = tgUser 
+  ? (tgUser.username ? `@${tgUser.username}` : tgUser.first_name) 
+  : "ти";
 
-  let players = [...baseBotsList, { name: "Ти (Гравець) 😎", aura: totalAura, isPlayer: true }];
-  players.sort((a, b) => b.aura - a.aura);
-
+let players = [...baseBotsList, { name: playerName, aura: totalAura, isPlayer: true }];
+players.sort((a, b) => b.aura - a.aura);
   players.forEach((p, index) => {
     const item = document.createElement('div');
     item.className = `leader-item ${p.isPlayer ? 'you' : ''}`;
