@@ -42,17 +42,9 @@
       100% { opacity: 0; background: transparent; }
     }
 
-    .tiger-aura-active {
-      animation: tigerPulse 0.8s infinite alternate ease-in-out !important;
-    }
-
-    .bad-aura-active {
-      animation: badGlitch 0.15s infinite ease-in-out !important;
-    }
-
-    .max-aura-active {
-      animation: maxPulseGlow 0.6s infinite alternate ease-in-out !important;
-    }
+    .tiger-aura-active { animation: tigerPulse 0.8s infinite alternate ease-in-out !important; }
+    .bad-aura-active { animation: badGlitch 0.15s infinite ease-in-out !important; }
+    .max-aura-active { animation: maxPulseGlow 0.6s infinite alternate ease-in-out !important; }
 
     .confetti {
       position: absolute;
@@ -69,6 +61,133 @@
         opacity: 0;
       }
     }
+
+    /* Перемикач режимів */
+    .mode-switch-container {
+      display: flex;
+      background: #1e1b4b;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #4c1d95;
+    }
+
+    .mode-btn {
+      flex: 1;
+      padding: 8px 0;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: #a78bfa;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .mode-btn.active {
+      background: #9333ea;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+    }
+
+    /* Стилі змагального режиму */
+    .competitive-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comp-btn {
+      position: relative;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .comp-btn-bot {
+      background: linear-gradient(90deg, #ff5722, #facc15);
+      color: #000;
+    }
+
+    .comp-btn-multiplayer {
+      background: #27272a;
+      color: #71717a;
+      cursor: not-allowed;
+      border: 1px dashed #52525b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .coming-soon-badge {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.6);
+      color: #a1a1aa;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Кнопки часу гри */
+    .time-modes {
+      display: flex;
+      gap: 8px;
+      margin: 15px 0;
+    }
+
+    .time-btn {
+      flex: 1;
+      padding: 10px 5px;
+      background: #1e1b4b;
+      color: #a78bfa;
+      border: 1px solid #4c1d95;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .time-btn.selected {
+      background: #9333ea;
+      color: #fff;
+      border-color: #c084fc;
+      box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+    }
+
+    /* Шкала перетягування аури */
+    .aura-bar-container {
+      width: 100%;
+      height: 24px;
+      background: #ef4444; /* Колір бота */
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      border: 2px solid #581c87;
+      margin: 10px 0;
+    }
+
+    .aura-bar-fill {
+      height: 100%;
+      background: #2ed573; /* Колір гравця */
+      width: 50%;
+      transition: width 0.1s ease;
+    }
+
+    .duel-scores-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
@@ -80,42 +199,104 @@
   <h2 style="color: #c084fc; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px;">✨ Aura tester ✨</h2>
   <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Дізнайся свою ауру або перевір її!</p>
 
-  <!-- Перемикачі -->
-  <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 15px;">
-    <button onclick="switchTab('dob')" id="btn-dob" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #9333ea; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🎂 По ДН</button>
-    <button onclick="switchTab('name')" id="btn-name" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🏷️ По імені</button>
-    <button onclick="switchTab('other')" id="btn-other" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🔮 Інша аура</button>
+  <!-- Перемикач режимів (Опис/Змагальний) -->
+  <div class="mode-switch-container">
+    <button id="mode-normal-btn" class="mode-btn active" onclick="switchGameMode('normal')">🔮 Звичайний</button>
+    <button id="mode-comp-btn" class="mode-btn" onclick="switchGameMode('comp')">⚔️ Змагальний</button>
   </div>
 
-  <!-- Поля вводу -->
-  <div id="tab-dob">
-    <input type="date" id="input-dob" style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-  </div>
-
-  <div id="tab-name" style="display: none;">
-    <input type="text" id="input-name" placeholder="Введи своє ім'я або ім'я друга..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-  </div>
-
-  <div id="tab-other" style="display: none;">
-    <input type="text" id="input-other" placeholder="Введи будь-що (слово, предмет,і т.д.)..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-  </div>
-
-  <br>
-  <button id="calc-btn" onclick="checkAura()" style="background: linear-gradient(90deg, #c084fc, #38edf8); color: #000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 14px; text-transform: uppercase;">
-    Дізнатися ауру 🚀
-  </button>
-
-  <!-- Блок результату -->
-  <div id="result-box" style="margin-top: 20px; display: none; background: #160a2a; padding: 15px; border-radius: 12px; border: 2px solid #581c87; transition: all 0.2s ease;">
-    <div id="aura-title" style="font-size: 18px; font-weight: bold; margin-bottom: 8px;"></div>
-    
-    <div id="meme-container" style="margin: 5px auto; min-height: 45px;">
-      <div id="meme-emoji" style="font-size: 46px;"></div>
+  <!-- БЛОК 1: Звичайний режим -->
+  <div id="normal-mode-block">
+    <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 15px;">
+      <button onclick="switchTab('dob')" id="btn-dob" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #9333ea; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🎂 По ДН</button>
+      <button onclick="switchTab('name')" id="btn-name" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🏷️ По імені</button>
+      <button onclick="switchTab('other')" id="btn-other" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🔮 Інша аура</button>
     </div>
 
-    <div id="aura-points" style="font-size: 28px; font-weight: 900; margin: 10px 0; letter-spacing: 0.5px;"></div>
+    <div id="tab-dob">
+      <input type="date" id="input-dob" style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
+    </div>
 
-    <p id="aura-desc" style="font-size: 13px; color: #e9d5ff; line-height: 1.4; margin: 0;"></p>
+    <div id="tab-name" style="display: none;">
+      <input type="text" id="input-name" placeholder="Введи своє ім'я або ім'я друга..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
+    </div>
+
+    <div id="tab-other" style="display: none;">
+      <input type="text" id="input-other" placeholder="Введи будь-що (слово, предмет, і т.д.)..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
+    </div>
+
+    <br>
+    <button id="calc-btn" onclick="checkAura()" style="background: linear-gradient(90deg, #c084fc, #38edf8); color: #000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 14px; text-transform: uppercase;">
+      Дізнатися ауру 🚀
+    </button>
+
+    <div id="result-box" style="margin-top: 20px; display: none; background: #160a2a; padding: 15px; border-radius: 12px; border: 2px solid #581c87; transition: all 0.2s ease;">
+      <div id="aura-title" style="font-size: 18px; font-weight: bold; margin-bottom: 8px;"></div>
+      <div id="meme-container" style="margin: 5px auto; min-height: 45px;">
+        <div id="meme-emoji" style="font-size: 46px;"></div>
+      </div>
+      <div id="aura-points" style="font-size: 28px; font-weight: 900; margin: 10px 0; letter-spacing: 0.5px;"></div>
+      <p id="aura-desc" style="font-size: 13px; color: #e9d5ff; line-height: 1.4; margin: 0;"></p>
+    </div>
+  </div>
+
+  <!-- БЛОК 2: Змагальний режим -->
+  <div id="comp-mode-block" style="display: none;">
+    <div id="comp-menu" class="competitive-box">
+      <button class="comp-btn comp-btn-bot" onclick="showBotMenu()">🤖 Гра з Ботом</button>
+      <button class="comp-btn comp-btn-multiplayer" disabled>
+        👥 Мультиплеєр
+        <span class="coming-soon-badge">Coming Soon</span>
+      </button>
+    </div>
+
+    <!-- Вибір часу гри проти бота -->
+    <div id="bot-time-select" style="display: none; margin-top: 10px;">
+      <h3 style="color: #c084fc; margin-bottom: 5px; font-size: 16px;">Обери режим часу:</h3>
+      
+      <div class="time-modes">
+        <button id="time-60" class="time-btn" onclick="selectTimeMode(60)">1 Режим<br>(1 хв)</button>
+        <button id="time-40" class="time-btn" onclick="selectTimeMode(40)">2 Режим<br>(40 сек)</button>
+        <button id="time-20" class="time-btn" onclick="selectTimeMode(20)">3 Режим<br>(20 сек)</button>
+      </div>
+
+      <button id="start-duel-btn" onclick="launchDuelGame()" style="display: none; width: 100%; background: linear-gradient(90deg, #c084fc, #38edf8); color: #000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 10px; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;">
+        Грати 🚀
+      </button>
+
+      <button onclick="hideBotMenu()" style="width: 100%; padding: 8px; background: #3f3f46; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">Назад</button>
+    </div>
+
+    <!-- Екран самої гри (Поле вводу та шкала) -->
+    <div id="active-duel-screen" style="display: none; margin-top: 10px;">
+      <div id="timer" style="font-size: 18px; font-weight: 900; color: #38edf8; margin-bottom: 5px;">
+        Залишилось: <span id="time-left">0</span>s
+      </div>
+
+      <!-- Шкала прогресу аури -->
+      <div class="duel-scores-header">
+        <span style="color: #2ed573;">Ти: <span id="player-score">0</span></span>
+        <span style="color: #ef4444;">Бот: <span id="bot-score">0</span></span>
+      </div>
+      
+      <div class="aura-bar-container">
+        <div id="aura-bar-fill" class="aura-bar-fill"></div>
+      </div>
+
+      <!-- Поле вводу слова -->
+      <div style="margin: 15px 0;">
+        <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 5px;">Вводь будь-яке слово для отримання аури:</p>
+        <input type="text" id="input-duel-word" placeholder="Вводь слово сюди..." style="width: 85%; padding: 12px; border-radius: 10px; border: 2px solid #9333ea; background: #1e1b4b; color: #fff; text-align: center; font-size: 15px; outline: none;">
+      </div>
+
+      <button id="send-word-btn" onclick="submitDuelWord()" style="width: 90%; background: #2ed573; color: #000; border: none; padding: 12px; font-weight: 900; border-radius: 10px; cursor: pointer; font-size: 14px; text-transform: uppercase;">
+        Надіслати слово 💥
+      </button>
+
+      <div id="duel-result" style="margin-top: 15px; font-size: 15px; font-weight: bold;"></div>
+      
+      <button id="exit-duel-btn" onclick="exitDuel()" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background: #3f3f46; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">До меню</button>
+    </div>
   </div>
 
 </div>
@@ -124,7 +305,6 @@
 <audio id="phonk-audio" crossorigin="anonymous" src="https://ia801503.us.archive.org/15/items/phonk-yara-yara/phonk-yara-yara.mp3" preload="auto"></audio>
 
 <script>
-// Ініціалізація Telegram Mini App
 if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.ready();
   window.Telegram.WebApp.expand();
@@ -134,98 +314,160 @@ let activeTab = 'dob';
 let isProcessing = false;
 let audioCtx = null;
 
-// Список із 10 рівнів аури
-const auraTiers = [
-  {
-    maxScore: 0,
-    title: '💀 -аура / sub 3',
-    color: '#ef4444',
-    desc: 'лох, навіть у живчика більше аури ніж у тебе!',
-    emoji: '🤡🗿',
-    animClass: 'bad-aura-active',
-    effect: 'badSound'
-  },
-  {
-    maxScore: 100000,
-    title: '📉 Bot',
-    color: '#f97316',
-    desc: 'Нульова аура, ти ,бот.',
-    emoji: '🤖📦',
-    animClass: '',
-    effect: null
-  },
-  {
-    maxScore: 220000,
-    title: '⚡ default aura ',
-    color: '#fbbf24',
-    desc: 'звичайна дефолтна аура',
-    emoji: '🙂⚡',
-    animClass: '',
-    effect: null
-  },
-  {
-    maxScore: 350000,
-    title: '🤙 normal ',
-    color: '#facc15',
-    desc: 'ну чиста аура.',
-    emoji: '😎🔥',
-    animClass: 'tiger-aura-active',
-    effect: null
-  },
-  {
-    maxScore: 500000,
-    title: '🔥 Заряджений тип',
-    color: '#ff5722',
-    desc: 'Твоя аура вже починає підпалювати оточуючих!',
-    emoji: '👺💥',
-    animClass: 'tiger-aura-active',
-    effect: null
-  },
-  {
-    maxScore: 650000,
-    title: '💎 Briliant aura',
-    color: '#06b6d4',
-    desc: 'Чистий Aura farming',
-    emoji: '💎🕶️',
-    animClass: 'max-aura-active',
-    effect: null
-  },
-  {
-    maxScore: 780000,
-    title: '🔮 mega aura',
-    color: '#a855f7',
-    desc: 'Твоя аура потуууужна!',
-    emoji: '🗿👑',
-    animClass: 'max-aura-active',
-    effect: 'confetti'
-  },
-  {
-    maxScore: 880000,
-    title: '🪐 Галактичний бос',
-    color: '#3b82f6',
-    desc: 'Рівень аури пробиває атмосферу планети!',
-    emoji: '🌌⚡',
-    animClass: 'max-aura-active',
-    effect: 'confetti'
-  },
-  {
-    maxScore: 960000,
-    title: '👑 True adam',
-    color: '#4ade80',
-    desc: '100% аура ',
-    emoji: '🤴🤑💰',
-    animClass: 'max-aura-active',
-    effect: 'phonk'
-  },
-  {
-    maxScore: Infinity,
-    title: '✨ gigachad',
-    color: '#38edf8',
-    desc: 'Нереальний зашкал аури!',
-    emoji: '👑⚡🪐',
-    animClass: 'max-aura-active',
-    effect: 'phonk'
+let selectedTime = 0;
+let playerScore = 0;
+let botScore = 0;
+let timeLeft = 0;
+let gameInterval = null;
+let botInterval = null;
+
+function switchGameMode(mode) {
+  const normalBtn = document.getElementById('mode-normal-btn');
+  const compBtn = document.getElementById('mode-comp-btn');
+  const normalBlock = document.getElementById('normal-mode-block');
+  const compBlock = document.getElementById('comp-mode-block');
+
+  if (mode === 'normal') {
+    normalBtn.classList.add('active');
+    compBtn.classList.remove('active');
+    normalBlock.style.display = 'block';
+    compBlock.style.display = 'none';
+  } else {
+    compBtn.classList.add('active');
+    normalBtn.classList.remove('active');
+    normalBlock.style.display = 'none';
+    compBlock.style.display = 'block';
   }
+}
+
+function showBotMenu() {
+  document.getElementById('comp-menu').style.display = 'none';
+  document.getElementById('bot-time-select').style.display = 'block';
+}
+
+function hideBotMenu() {
+  document.getElementById('bot-time-select').style.display = 'none';
+  document.getElementById('comp-menu').style.display = 'flex';
+}
+
+function selectTimeMode(seconds) {
+  selectedTime = seconds;
+  
+  document.getElementById('time-60').classList.remove('selected');
+  document.getElementById('time-40').classList.remove('selected');
+  document.getElementById('time-20').classList.remove('selected');
+  
+  document.getElementById(`time-${seconds}`).classList.add('selected');
+  document.getElementById('start-duel-btn').style.display = 'block';
+}
+
+function launchDuelGame() {
+  document.getElementById('bot-time-select').style.display = 'none';
+  document.getElementById('active-duel-screen').style.display = 'block';
+  
+  playerScore = 0;
+  botScore = 0;
+  timeLeft = selectedTime;
+  
+  document.getElementById('player-score').innerText = '0';
+  document.getElementById('bot-score').innerText = '0';
+  document.getElementById('time-left').innerText = timeLeft;
+  document.getElementById('duel-result').innerText = '';
+  document.getElementById('aura-bar-fill').style.width = '50%';
+  
+  document.getElementById('input-duel-word').disabled = false;
+  document.getElementById('send-word-btn').disabled = false;
+  document.getElementById('exit-duel-btn').style.display = 'none';
+
+  // Таймер дуелі
+  gameInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('time-left').innerText = timeLeft;
+
+    if (timeLeft <= 0) {
+      endDuel();
+    }
+  }, 1000);
+
+  // Автоматичне нарахування аури боту
+  botInterval = setInterval(() => {
+    if (Math.random() > 0.3) { 
+      botScore += Math.floor(Math.random() * 400) + 100;
+      updateDuelUI();
+    }
+  }, 800);
+}
+
+function submitDuelWord() {
+  const input = document.getElementById('input-duel-word');
+  const word = input.value.trim();
+  
+  if (!word) return;
+
+  // Рахуємо ауру за введене слово
+  const addedAura = Math.abs(getAuraScoreFromInput(word) % 800) + 200;
+  playerScore += addedAura;
+  
+  input.value = '';
+  playTickSound();
+  updateDuelUI();
+}
+
+function updateDuelUI() {
+  document.getElementById('player-score').innerText = playerScore.toLocaleString();
+  document.getElementById('bot-score').innerText = botScore.toLocaleString();
+  
+  const total = playerScore + botScore;
+  let percentage = 50;
+  
+  if (total > 0) {
+    percentage = Math.min(Math.max((playerScore / total) * 100, 5), 95);
+  }
+  
+  document.getElementById('aura-bar-fill').style.width = `${percentage}%`;
+}
+
+function endDuel() {
+  clearInterval(gameInterval);
+  clearInterval(botInterval);
+
+  document.getElementById('input-duel-word').disabled = true;
+  document.getElementById('send-word-btn').disabled = true;
+  document.getElementById('exit-duel-btn').style.display = 'block';
+
+  const resultText = document.getElementById('duel-result');
+
+  if (playerScore > botScore) {
+    resultText.innerHTML = `🎉 Перемога! Ти обігнав бота і забрав ауру!`;
+    resultText.style.color = '#2ed573';
+    spawnConfetti();
+  } else if (botScore > playerScore) {
+    resultText.innerHTML = `💥 Поразка! Бот набрав більше аури.`;
+    resultText.style.color = '#ef4444';
+    playBadSound();
+  } else {
+    resultText.innerHTML = `🤝 Нічия! Сили виявилися рівними.`;
+    resultText.style.color = '#facc15';
+  }
+}
+
+function exitDuel() {
+  document.getElementById('active-duel-screen').style.display = 'none';
+  document.getElementById('comp-menu').style.display = 'flex';
+}
+
+// Звичайна аура
+const auraTiers = [
+  { maxScore: 0, title: '💀 -аура / sub 3', color: '#ef4444', desc: 'лох, навіть у живчика більше аури ніж у тебе!', emoji: '🤡🗿', animClass: 'bad-aura-active', effect: 'badSound' },
+  { maxScore: 100000, title: '📉 Bot', color: '#f97316', desc: 'Нульова аура, ти ,бот.', emoji: '🤖📦', animClass: '', effect: null },
+  { maxScore: 220000, title: '⚡ default aura ', color: '#fbbf24', desc: 'звичайна дефолтна аура', emoji: '🙂⚡', animClass: '', effect: null },
+  { maxScore: 350000, title: '🤙 normal ', color: '#facc15', desc: 'ну чиста аура.', emoji: '😎🔥', animClass: 'tiger-aura-active', effect: null },
+  { maxScore: 500000, title: '🔥 Заряджений тип', color: '#ff5722', desc: 'Твоя аура вже починає підпалювати оточуючих!', emoji: '👺💥', animClass: 'tiger-aura-active', effect: null },
+  { maxScore: 650000, title: '💎 Briliant aura', color: '#06b6d4', desc: 'Чистий Aura farming', emoji: '💎🕶️', animClass: 'max-aura-active', effect: null },
+  { maxScore: 780000, title: '🔮 mega aura', color: '#a855f7', desc: 'Твоя аура потуууужна!', emoji: '🗿👑', animClass: 'max-aura-active', effect: 'confetti' },
+  { maxScore: 880000, title: '🪐 Галактичний бос', color: '#3b82f6', desc: 'Рівень аури пробиває атмосферу планети!', emoji: '🌌⚡', animClass: 'max-aura-active', effect: 'confetti' },
+  { maxScore: 960000, title: '👑 True adam', color: '#4ade80', desc: '100% аура ', emoji: '🤴🤑💰', animClass: 'max-aura-active', effect: 'phonk' },
+  { maxScore: Infinity, title: '✨ gigachad', color: '#38edf8', desc: 'Нереальний зашкал аури!', emoji: '👑⚡🪐', animClass: 'max-aura-active', effect: 'phonk' }
 ];
 
 function getAuraScoreFromInput(str) {
@@ -235,7 +477,6 @@ function getAuraScoreFromInput(str) {
     hash = ((hash << 5) - hash) + cleanStr.charCodeAt(i);
     hash |= 0;
   }
-  
   const min = -10000;
   const max = 1000000;
   const normalized = Math.abs(hash) % (max - min + 1);
@@ -348,7 +589,6 @@ function checkAura() {
   btn.innerText = 'Нараховуємо... 💰';
 
   const targetScore = getAuraScoreFromInput(val);
-
   const tier = auraTiers.find(t => targetScore <= t.maxScore) || auraTiers[auraTiers.length - 1];
 
   const resultBox = document.getElementById('result-box');
