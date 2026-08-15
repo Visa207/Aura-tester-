@@ -17,6 +17,26 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
+    /* Лічильник загальної аури */
+    .total-aura-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(30, 27, 75, 0.85);
+      border: 1px solid #c084fc;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      color: #38edf8;
+      box-shadow: 0 0 10px rgba(56, 237, 248, 0.2);
+      backdrop-filter: blur(5px);
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
     @keyframes tigerPulse {
       0% { box-shadow: 0 0 10px #facc15; border-color: #facc15; }
       50% { box-shadow: 0 0 25px #f59e0b; border-color: #f59e0b; transform: scale(1.01); }
@@ -62,7 +82,6 @@
       }
     }
 
-    /* Перемикач режимів */
     .mode-switch-container {
       display: flex;
       background: #1e1b4b;
@@ -91,7 +110,6 @@
       box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
     }
 
-    /* Стилі змагального режиму */
     .competitive-box {
       display: flex;
       flex-direction: column;
@@ -135,7 +153,6 @@
       letter-spacing: 1px;
     }
 
-    /* Кнопки часу гри */
     .time-modes {
       display: flex;
       gap: 8px;
@@ -162,11 +179,10 @@
       box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
     }
 
-    /* Шкала перетягування аури */
     .aura-bar-container {
       width: 100%;
       height: 24px;
-      background: #ef4444; /* Колір бота */
+      background: #ef4444;
       border-radius: 12px;
       overflow: hidden;
       display: flex;
@@ -176,7 +192,7 @@
 
     .aura-bar-fill {
       height: 100%;
-      background: #2ed573; /* Колір гравця */
+      background: #2ed573;
       width: 50%;
       transition: width 0.1s ease;
     }
@@ -196,10 +212,15 @@
 
 <div id="aura-widget-container" style="position: relative; overflow: hidden; font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f0f17; color: #fff; padding: 20px; border-radius: 20px; max-width: 420px; margin: 0 auto; box-shadow: 0 0 25px rgba(168, 85, 247, 0.3); border: 2px solid #2e1065; transition: all 0.2s ease;">
   
+  <!-- Загальна аура (лише для змагального режиму) -->
+  <div id="total-aura-display" class="total-aura-badge" style="display: none;">
+    ⚡ <span id="total-aura-count">0</span> AURA
+  </div>
+
   <h2 style="color: #c084fc; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px;">✨ Aura tester ✨</h2>
   <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Дізнайся свою ауру або перевір її!</p>
 
-  <!-- Перемикач режимів (Опис/Змагальний) -->
+  <!-- Перемикач режимів -->
   <div class="mode-switch-container">
     <button id="mode-normal-btn" class="mode-btn active" onclick="switchGameMode('normal')">🔮 Звичайний</button>
     <button id="mode-comp-btn" class="mode-btn" onclick="switchGameMode('comp')">⚔️ Змагальний</button>
@@ -267,13 +288,12 @@
       <button onclick="hideBotMenu()" style="width: 100%; padding: 8px; background: #3f3f46; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">Назад</button>
     </div>
 
-    <!-- Екран самої гри (Поле вводу та шкала) -->
+    <!-- Екран гри -->
     <div id="active-duel-screen" style="display: none; margin-top: 10px;">
       <div id="timer" style="font-size: 18px; font-weight: 900; color: #38edf8; margin-bottom: 5px;">
         Залишилось: <span id="time-left">0</span>s
       </div>
 
-      <!-- Шкала прогресу аури -->
       <div class="duel-scores-header">
         <span style="color: #2ed573;">Ти: <span id="player-score">0</span></span>
         <span style="color: #ef4444;">Бот: <span id="bot-score">0</span></span>
@@ -283,7 +303,6 @@
         <div id="aura-bar-fill" class="aura-bar-fill"></div>
       </div>
 
-      <!-- Поле вводу слова -->
       <div style="margin: 15px 0;">
         <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 5px;">Вводь будь-яке слово для отримання аури:</p>
         <input type="text" id="input-duel-word" placeholder="Вводь слово сюди..." style="width: 85%; padding: 12px; border-radius: 10px; border: 2px solid #9333ea; background: #1e1b4b; color: #fff; text-align: center; font-size: 15px; outline: none;">
@@ -301,7 +320,6 @@
 
 </div>
 
-<!-- Phonk Audio -->
 <audio id="phonk-audio" crossorigin="anonymous" src="https://ia801503.us.archive.org/15/items/phonk-yara-yara/phonk-yara-yara.mp3" preload="auto"></audio>
 
 <script>
@@ -321,22 +339,33 @@ let timeLeft = 0;
 let gameInterval = null;
 let botInterval = null;
 
+// Завантаження збереженої загальної аури
+let totalAura = parseInt(localStorage.getItem('user_total_aura')) || 0;
+updateTotalAuraUI();
+
+function updateTotalAuraUI() {
+  document.getElementById('total-aura-count').innerText = totalAura.toLocaleString();
+}
+
 function switchGameMode(mode) {
   const normalBtn = document.getElementById('mode-normal-btn');
   const compBtn = document.getElementById('mode-comp-btn');
   const normalBlock = document.getElementById('normal-mode-block');
   const compBlock = document.getElementById('comp-mode-block');
+  const totalAuraBadge = document.getElementById('total-aura-display');
 
   if (mode === 'normal') {
     normalBtn.classList.add('active');
     compBtn.classList.remove('active');
     normalBlock.style.display = 'block';
     compBlock.style.display = 'none';
+    totalAuraBadge.style.display = 'none';
   } else {
     compBtn.classList.add('active');
     normalBtn.classList.remove('active');
     normalBlock.style.display = 'none';
     compBlock.style.display = 'block';
+    totalAuraBadge.style.display = 'flex';
   }
 }
 
@@ -379,7 +408,6 @@ function launchDuelGame() {
   document.getElementById('send-word-btn').disabled = false;
   document.getElementById('exit-duel-btn').style.display = 'none';
 
-  // Таймер дуелі
   gameInterval = setInterval(() => {
     timeLeft--;
     document.getElementById('time-left').innerText = timeLeft;
@@ -389,7 +417,6 @@ function launchDuelGame() {
     }
   }, 1000);
 
-  // Автоматичне нарахування аури боту
   botInterval = setInterval(() => {
     if (Math.random() > 0.3) { 
       botScore += Math.floor(Math.random() * 400) + 100;
@@ -404,7 +431,6 @@ function submitDuelWord() {
   
   if (!word) return;
 
-  // Рахуємо ауру за введене слово
   const addedAura = Math.abs(getAuraScoreFromInput(word) % 800) + 200;
   playerScore += addedAura;
   
@@ -438,15 +464,20 @@ function endDuel() {
   const resultText = document.getElementById('duel-result');
 
   if (playerScore > botScore) {
-    resultText.innerHTML = `🎉 Перемога! Ти обігнав бота і забрав ауру!`;
+    const gainedAura = playerScore + botScore;
+    totalAura += gainedAura;
+    localStorage.setItem('user_total_aura', totalAura);
+    updateTotalAuraUI();
+
+    resultText.innerHTML = `🎉 Перемога!<br><span style="color: #38edf8; font-size: 17px;">+${gainedAura.toLocaleString()} AURA</span> (твоя + бота)`;
     resultText.style.color = '#2ed573';
     spawnConfetti();
   } else if (botScore > playerScore) {
-    resultText.innerHTML = `💥 Поразка! Бот набрав більше аури.`;
+    resultText.innerHTML = `💥 Поразка! Бот набрав більше аури.<br><span style="color: #ef4444; font-size: 14px;">+0 AURA</span>`;
     resultText.style.color = '#ef4444';
     playBadSound();
   } else {
-    resultText.innerHTML = `🤝 Нічия! Сили виявилися рівними.`;
+    resultText.innerHTML = `🤝 Нічия! Сили виявилися рівними.<br><span style="color: #facc15; font-size: 14px;">+0 AURA</span>`;
     resultText.style.color = '#facc15';
   }
 }
@@ -456,7 +487,6 @@ function exitDuel() {
   document.getElementById('comp-menu').style.display = 'flex';
 }
 
-// Звичайна аура
 const auraTiers = [
   { maxScore: 0, title: '💀 -аура / sub 3', color: '#ef4444', desc: 'лох, навіть у живчика більше аури ніж у тебе!', emoji: '🤡🗿', animClass: 'bad-aura-active', effect: 'badSound' },
   { maxScore: 100000, title: '📉 Bot', color: '#f97316', desc: 'Нульова аура, ти ,бот.', emoji: '🤖📦', animClass: '', effect: null },
