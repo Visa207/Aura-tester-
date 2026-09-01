@@ -1,820 +1,673 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aura Tester Mini App</title>
-
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SITRO DROP - CS2 Wheel Upgrader</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 10px;
-      background-color: #08080d;
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
-    /* Лічильник загальної аури */
-    .total-aura-badge {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(30, 27, 75, 0.85);
-      border: 1px solid #c084fc;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      color: #38edf8;
-      box-shadow: 0 0 10px rgba(56, 237, 248, 0.2);
-      backdrop-filter: blur(5px);
+    body {
+      background-color: #0b0b0d;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    .glow-bg {
+      position: fixed;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(255, 115, 0, 0.25) 0%, rgba(0,0,0,0) 70%);
+      z-index: 0;
+      pointer-events: none;
+      filter: blur(25px);
+    }
+
+    header {
+      position: relative;
       z-index: 10;
+      width: 100%;
+      padding: 15px 0;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #ffffff;
+      text-shadow: 0 0 12px rgba(255, 120, 0, 0.6);
+      text-transform: uppercase;
+    }
+
+    .logo span {
+      color: #ff7700;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-grow: 1;
+      justify-content: center;
+      padding: 0 15px;
+    }
+
+    .wheel-wrapper {
+      position: relative;
+      width: 290px;
+      height: 290px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wheel-pointer {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 24px solid #ff7700;
+      z-index: 20;
+      filter: drop-shadow(0 0 8px rgba(255, 119, 0, 0.9));
+    }
+
+    canvas#wheelCanvas {
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      box-shadow: 0 0 25px rgba(255, 110, 0, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
+      border: 3px solid rgba(255, 120, 0, 0.5);
+    }
+
+    .btn-reroll {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 119, 0, 0.4);
+      color: #ffaa33;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: all 0.2s;
+    }
+
+    .btn-reroll:active {
+      transform: scale(0.95);
+      background: rgba(255, 119, 0, 0.2);
+    }
+
+    .selected-slot-card {
+      width: 100%;
+      max-width: 320px;
+      background: rgba(18, 18, 22, 0.9);
+      border: 1px solid rgba(255, 119, 0, 0.4);
+      border-radius: 14px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    }
+
+    .slot-details .title {
+      font-size: 11px;
+      color: #888888;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .slot-details .name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .slot-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ff8800;
+    }
+
+    .btn-spin {
+      width: 100%;
+      max-width: 320px;
+      padding: 14px;
+      background: linear-gradient(135deg, #ff8800 0%, #e64a00 100%);
+      border: none;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 6px 20px rgba(230, 74, 0, 0.45);
+      transition: all 0.2s ease;
     }
 
-    .total-aura-badge:active {
-      transform: scale(0.95);
-      box-shadow: 0 0 15px rgba(192, 132, 252, 0.5);
+    .btn-spin:active {
+      transform: scale(0.97);
     }
 
-    /* Модальне вікно Таблиці Лідерів */
+    .btn-spin:disabled {
+      background: #2a2a30;
+      color: #666666;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(14, 14, 18, 0.95);
+      border-top: 1px solid rgba(255, 120, 0, 0.3);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 90;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-inventory {
+      background: linear-gradient(135deg, #252530 0%, #1a1a22 100%);
+      border: 1px solid rgba(255, 120, 0, 0.5);
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 12px rgba(255, 120, 0, 0.2);
+    }
+
+    .btn-steam-link {
+      background: linear-gradient(135deg, #171a21 0%, #2a475e 100%);
+      border: 1px solid #66c0f4;
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 10px rgba(102, 192, 244, 0.2);
+    }
+
     .modal-overlay {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(8, 8, 13, 0.85);
+      background: rgba(0, 0, 0, 0.8);
       backdrop-filter: blur(6px);
       z-index: 100;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: fadeIn 0.2s ease-out;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    .leaderboard-card {
-      background: #130e26;
-      border: 2px solid #7e22ce;
-      border-radius: 16px;
-      width: 88%;
-      max-height: 80%;
-      padding: 15px;
-      box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .leaderboard-list {
-      margin-top: 10px;
-      overflow-y: auto;
-      max-height: 250px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .leader-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: #1e1b4b;
-      border-radius: 10px;
-      border: 1px solid #4c1d95;
-      font-size: 13px;
-    }
-
-    .leader-item.you {
-      background: linear-gradient(90deg, #4c1d95, #2e1065);
-      border: 1px solid #38edf8;
-      box-shadow: 0 0 10px rgba(56, 237, 248, 0.3);
-    }
-
-    .rank {
-      font-weight: 900;
-      width: 25px;
-    }
-
-    .rank-1 { color: #facc15; }
-    .rank-2 { color: #e2e8f0; }
-    .rank-3 { color: #f97316; }
-
-    @keyframes tigerPulse {
-      0% { box-shadow: 0 0 10px #facc15; border-color: #facc15; }
-      50% { box-shadow: 0 0 25px #f59e0b; border-color: #f59e0b; transform: scale(1.01); }
-      100% { box-shadow: 0 0 10px #facc15; border-color: #facc15; }
-    }
-
-    @keyframes badGlitch {
-      0% { transform: translate(0, 0); box-shadow: 0 0 10px #ef4444; }
-      25% { transform: translate(-3px, 3px); box-shadow: 0 0 20px #ef4444; }
-      50% { transform: translate(3px, -3px); border-color: #dc2626; }
-      75% { transform: translate(-3px, -2px); }
-      100% { transform: translate(0, 0); box-shadow: 0 0 10px #ef4444; }
-    }
-
-    @keyframes maxPulseGlow {
-      0% { transform: scale(1); box-shadow: 0 0 20px #4ade80; border-color: #4ade80; }
-      50% { transform: scale(1.03); box-shadow: 0 0 40px #38edf8, 0 0 20px #c084fc; border-color: #38edf8; }
-      100% { transform: scale(1); box-shadow: 0 0 20px #4ade80; border-color: #4ade80; }
-    }
-
-    @keyframes flashOverlay {
-      0% { opacity: 0.85; background: #fff; }
-      100% { opacity: 0; background: transparent; }
-    }
-
-    .tiger-aura-active { animation: tigerPulse 0.8s infinite alternate ease-in-out !important; }
-    .bad-aura-active { animation: badGlitch 0.15s infinite ease-in-out !important; }
-    .max-aura-active { animation: maxPulseGlow 0.6s infinite alternate ease-in-out !important; }
-
-    .confetti {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      z-index: 99;
-      top: -10px;
-      animation: fall 2s linear forwards;
-    }
-
-    @keyframes fall {
-      to {
-        transform: translateY(380px) rotate(720deg);
-        opacity: 0;
-      }
-    }
-
-    .mode-switch-container {
-      display: flex;
-      background: #1e1b4b;
-      padding: 4px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      border: 1px solid #4c1d95;
-    }
-
-    .mode-btn {
-      flex: 1;
-      padding: 8px 0;
-      border: none;
-      border-radius: 8px;
-      background: transparent;
-      color: #a78bfa;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .mode-btn.active {
-      background: #9333ea;
-      color: #fff;
-      box-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
-    }
-
-    .competitive-box {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .comp-btn {
-      position: relative;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .comp-btn-bot {
-      background: linear-gradient(90deg, #ff5722, #facc15);
-      color: #000;
-    }
-
-    .comp-btn-multiplayer {
-      background: #27272a;
-      color: #71717a;
-      cursor: not-allowed;
-      border: 1px dashed #52525b;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .coming-soon-badge {
-      position: absolute;
-      background: rgba(0, 0, 0, 0.6);
-      color: #a1a1aa;
-      font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 6px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .time-modes {
-      display: flex;
-      gap: 8px;
-      margin: 15px 0;
-    }
-
-    .time-btn {
-      flex: 1;
-      padding: 10px 5px;
-      background: #1e1b4b;
-      color: #a78bfa;
-      border: 1px solid #4c1d95;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .time-btn.selected {
-      background: #9333ea;
-      color: #fff;
-      border-color: #c084fc;
-      box-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
-    }
-
-    .aura-bar-container {
+    .inventory-sheet {
+      position: fixed;
+      bottom: -100%;
+      left: 50%;
+      transform: translateX(-50%);
       width: 100%;
-      height: 24px;
-      background: #ef4444;
-      border-radius: 12px;
-      overflow: hidden;
+      max-width: 440px;
+      height: 70vh;
+      background: #121216;
+      border-top-left-radius: 22px;
+      border-top-right-radius: 22px;
+      border-top: 2px solid #ff7700;
+      z-index: 101;
+      padding: 20px;
       display: flex;
-      border: 2px solid #581c87;
-      margin: 10px 0;
+      flex-direction: column;
+      transition: bottom 0.35s ease;
     }
 
-    .aura-bar-fill {
-      height: 100%;
-      background: #2ed573;
-      width: 50%;
-      transition: width 0.1s ease;
+    .modal-overlay.active .inventory-sheet {
+      bottom: 0;
     }
 
-    .duel-scores-header {
+    .sheet-header {
       display: flex;
       justify-content: space-between;
-      font-size: 13px;
-      font-weight: bold;
-      margin-top: 5px;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: #888888;
+      font-size: 26px;
+      cursor: pointer;
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      overflow-y: auto;
+      flex-grow: 1;
+      padding-bottom: 10px;
+    }
+
+    .item-card {
+      background: rgba(22, 22, 28, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .item-card.selected {
+      border-color: #ff7700;
+      box-shadow: 0 0 12px rgba(255, 119, 0, 0.4);
+    }
+
+    .item-card .rarity-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .item-card .name {
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .item-card .price {
+      font-size: 14px;
+      font-weight: 800;
+      color: #ff8800;
+    }
+
+    .result-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-50px);
+      background: #1a1a22;
+      border: 2px solid #ff7700;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 14px;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s ease;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .result-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .rarity-consumer { background-color: #b0c3d9; }
+    .rarity-restricted { background-color: #8847ff; }
+    .rarity-classified { background-color: #d32ce6; }
+    .rarity-covert { background-color: #eb4b4b; }
+    .rarity-gold { background-color: #ffd700; }
   </style>
 </head>
 <body>
 
-<div id="flash-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:90;"></div>
+  <div class="glow-bg"></div>
 
-<div id="aura-widget-container" style="position: relative; overflow: hidden; font-family: 'Segoe UI', sans-serif; text-align: center; background: #0f0f17; color: #fff; padding: 20px; border-radius: 20px; max-width: 420px; margin: 0 auto; box-shadow: 0 0 25px rgba(168, 85, 247, 0.3); border: 2px solid #2e1065; transition: all 0.2s ease;">
-  
-  <!-- Загальна аура (клікабельна) -->
-  <div id="total-aura-display" class="total-aura-badge" onclick="openLeaderboard()" style="display: none;">
-    ⚡ <span id="total-aura-count">0</span> AURA
+  <header>
+    <div class="logo">SITRO <span>DROP</span></div>
+  </header>
+
+  <div class="app-container">
+    <div class="wheel-wrapper">
+      <div class="wheel-pointer"></div>
+      <canvas id="wheelCanvas" width="560" height="560"></canvas>
+    </div>
+
+    <button class="btn-reroll" onclick="rerollWheelSkins()">🔄 Change Wheel Skins</button>
+
+    <div class="selected-slot-card">
+      <div class="slot-details">
+        <div class="title">Staked Skin</div>
+        <div class="name" id="slotName">Select Skin</div>
+      </div>
+      <div class="slot-price" id="slotPrice">$0</div>
+    </div>
+
+    <button class="btn-spin" id="spinBtn" onclick="spinWheel()">SPIN WHEEL</button>
   </div>
 
-  <h2 style="color: #c084fc; margin: 0 0 5px 0; text-transform: uppercase; letter-spacing: 1px;">✨ Aura tester ✨</h2>
-  <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Дізнайся свою ауру або перевір її!</p>
-
-  <!-- Перемикач режимів -->
-  <div class="mode-switch-container">
-    <button id="mode-normal-btn" class="mode-btn active" onclick="switchGameMode('normal')">🔮 Звичайний</button>
-    <button id="mode-comp-btn" class="mode-btn" onclick="switchGameMode('comp')">⚔️ Змагальний</button>
-  </div>
-
-  <!-- БЛОК 1: Звичайний режим -->
-  <div id="normal-mode-block">
-    <div style="display: flex; gap: 6px; justify-content: center; margin-bottom: 15px;">
-      <button onclick="switchTab('dob')" id="btn-dob" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #9333ea; color: #fff; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🎂 По ДН</button>
-      <button onclick="switchTab('name')" id="btn-name" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🏷️ По імені</button>
-      <button onclick="switchTab('other')" id="btn-other" style="flex:1; padding: 8px 4px; border: none; border-radius: 8px; background: #1e1b4b; color: #a78bfa; font-size: 11px; font-weight: bold; cursor: pointer; transition: 0.2s;">🔮 Інша аура</button>
-    </div>
-
-    <div id="tab-dob">
-      <input type="date" id="input-dob" style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-    </div>
-
-    <div id="tab-name" style="display: none;">
-      <input type="text" id="input-name" placeholder="Введи своє ім'я або ім'я друга..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-    </div>
-
-    <div id="tab-other" style="display: none;">
-      <input type="text" id="input-other" placeholder="Введи будь-що (слово, предмет, і т.д.)..." style="width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #6b21a8; background: #1e1b4b; color: #fff; text-align: center; font-size: 14px; outline: none;">
-    </div>
-
-    <br>
-    <button id="calc-btn" onclick="checkAura()" style="background: linear-gradient(90deg, #c084fc, #38edf8); color: #000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 10px; cursor: pointer; transition: 0.2s; font-size: 14px; text-transform: uppercase;">
-      Дізнатися ауру 🚀
+  <div class="bottom-bar">
+    <button class="btn-inventory" onclick="toggleModal('inventoryModal', true)">
+      <span>🎒</span> INVENTORY (<span id="invCount">0</span>)
     </button>
+    <a href="https://store.steampowered.com/tags/da/Inventarstyring/?l=russian&snr=1_5_9__409" target="_blank" class="btn-steam-link">
+      📥 Add from Steam
+    </a>
+  </div>
 
-    <div id="result-box" style="margin-top: 20px; display: none; background: #160a2a; padding: 15px; border-radius: 12px; border: 2px solid #581c87; transition: all 0.2s ease;">
-      <div id="aura-title" style="font-size: 18px; font-weight: bold; margin-bottom: 8px;"></div>
-      <div id="meme-container" style="margin: 5px auto; min-height: 45px;">
-        <div id="meme-emoji" style="font-size: 46px;"></div>
+  <!-- Inventory Modal -->
+  <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
+    <div class="inventory-sheet" onclick="event.stopPropagation()">
+      <div class="sheet-header">
+        <div class="sheet-title">Your Game Inventory</div>
+        <button class="btn-close" onclick="toggleModal('inventoryModal', false)">&times;</button>
       </div>
-      <div id="aura-points" style="font-size: 28px; font-weight: 900; margin: 10px 0; letter-spacing: 0.5px;"></div>
-      <p id="aura-desc" style="font-size: 13px; color: #e9d5ff; line-height: 1.4; margin: 0;"></p>
+      <div class="inventory-grid" id="inventoryGrid"></div>
     </div>
   </div>
 
-  <!-- БЛОК 2: Змагальний режим -->
-  <div id="comp-mode-block" style="display: none;">
-    <div id="comp-menu" class="competitive-box">
-      <button class="comp-btn comp-btn-bot" onclick="showBotMenu()">🤖 Гра з Ботом</button>
-      <button class="comp-btn comp-btn-multiplayer" disabled>
-        👥 Мультиплеєр
-        <span class="coming-soon-badge">Coming Soon</span>
-      </button>
-    </div>
+  <div class="result-toast" id="resultToast">RESULTS</div>
 
-    <div id="bot-time-select" style="display: none; margin-top: 10px;">
-      <h3 style="color: #c084fc; margin-bottom: 5px; font-size: 16px;">Обери режим часу:</h3>
-      
-      <div class="time-modes">
-        <button id="time-60" class="time-btn" onclick="selectTimeMode(60)">1 Режим<br>(1 хв)</button>
-        <button id="time-40" class="time-btn" onclick="selectTimeMode(40)">2 Режим<br>(40 сек)</button>
-        <button id="time-20" class="time-btn" onclick="selectTimeMode(20)">3 Режим<br>(20 сек)</button>
-      </div>
+  <script>
+    // CS2 Skins Database
+    const SKIN_POOL = [
+      { id: 1, name: 'P250 | Sand Dune', price: 2, rarity: 'rarity-consumer' },
+      { id: 2, name: 'AK-47 | Safari Mesh', price: 10, rarity: 'rarity-consumer' },
+      { id: 3, name: 'M4A4 | Evil Daimyo', price: 25, rarity: 'rarity-restricted' },
+      { id: 4, name: 'AWP | Acheron', price: 50, rarity: 'rarity-restricted' },
+      { id: 5, name: 'AK-47 | Redline', price: 100, rarity: 'rarity-classified' },
+      { id: 6, name: 'AWP | Asiimov', price: 200, rarity: 'rarity-covert' },
+      { id: 7, name: 'AK-47 | Vulcan', price: 400, rarity: 'rarity-covert' },
+      { id: 8, name: 'M4A1-S | Printstream', price: 500, rarity: 'rarity-covert' },
+      { id: 9, name: 'Karambit | Doppler', price: 800, rarity: 'rarity-gold' }
+    ];
 
-      <button id="start-duel-btn" onclick="launchDuelGame()" style="display: none; width: 100%; background: linear-gradient(90deg, #c084fc, #38edf8); color: #000; border: none; padding: 12px 25px; font-weight: 900; border-radius: 10px; cursor: pointer; font-size: 14px; text-transform: uppercase; margin-bottom: 10px;">
-        Грати 🚀
-      </button>
+    // Initial Inventory: Only ONE cheap starter skin ($2)
+    let userInventory = [
+      { ...SKIN_POOL[0], instanceId: 101 }
+    ];
 
-      <button onclick="hideBotMenu()" style="width: 100%; padding: 8px; background: #3f3f46; color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">Назад</button>
-    </div>
+    let selectedSkin = userInventory[0];
+    let isSpinning = false;
+    let currentWheelSkins = [];
+    let currentRotation = 0;
 
-    <div id="active-duel-screen" style="display: none; margin-top: 10px;">
-      <div id="timer" style="font-size: 18px; font-weight: 900; color: #38edf8; margin-bottom: 5px;">
-        Залишилось: <span id="time-left">0</span>s
-      </div>
+    const canvas = document.getElementById('wheelCanvas');
+    const ctx = canvas.getContext('2d');
 
-      <div class="duel-scores-header">
-        <span style="color: #2ed573;">Ти: <span id="player-score">0</span></span>
-        <span style="color: #ef4444;">Бот: <span id="bot-score">0</span></span>
-      </div>
-      
-      <div class="aura-bar-container">
-        <div id="aura-bar-fill" class="aura-bar-fill"></div>
-      </div>
-
-      <div style="margin: 15px 0;">
-        <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 5px;">Вводь будь-яке слово для отримання аури:</p>
-        <input type="text" id="input-duel-word" placeholder="Вводь слово сюди..." style="width: 85%; padding: 12px; border-radius: 10px; border: 2px solid #9333ea; background: #1e1b4b; color: #fff; text-align: center; font-size: 15px; outline: none;">
-      </div>
-
-      <button id="send-word-btn" onclick="submitDuelWord()" style="width: 90%; background: #2ed573; color: #000; border: none; padding: 12px; font-weight: 900; border-radius: 10px; cursor: pointer; font-size: 14px; text-transform: uppercase;">
-        Надіслати слово 💥
-      </button>
-
-      <div id="duel-result" style="margin-top: 15px; font-size: 15px; font-weight: bold;"></div>
-      
-      <button id="exit-duel-btn" onclick="exitDuel()" style="display: none; margin-top: 10px; width: 100%; padding: 10px; background: #3f3f46; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">До меню</button>
-    </div>
-  </div>
-
-  <!-- МОДАЛЬНЕ ВІКНО: ТАБЛИЦЯ ЛІДЕРІВ -->
-  <div id="leaderboard-modal" class="modal-overlay" style="display: none;">
-    <div class="leaderboard-card">
-      <h3 style="color: #c084fc; margin: 0 0 10px 0; font-size: 18px; text-transform: uppercase;">🏆 Таблиця лідерів</h3>
-      <p style="font-size: 11px; color: #a7f3d0; margin-top: -5px; margin-bottom: 10px;">Топ за загальною кількістю аури</p>
-      
-      <div id="leaderboard-list" class="leaderboard-list">
-        <!-- Список генерується JS -->
-      </div>
-
-      <button onclick="closeLeaderboard()" style="margin-top: 15px; width: 100%; padding: 10px; background: #9333ea; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 13px;">Закрити</button>
-    </div>
-  </div>
-
-</div>
-
-<audio id="phonk-audio" crossorigin="anonymous" src="https://ia801503.us.archive.org/15/items/phonk-yara-yara/phonk-yara-yara.mp3" preload="auto"></audio>
-
-<script>
-if (window.Telegram && window.Telegram.WebApp) {
-  window.Telegram.WebApp.ready();
-  window.Telegram.WebApp.expand();
-}
-
-let activeTab = 'dob';
-let isProcessing = false;
-let audioCtx = null;
-
-let selectedTime = 0;
-let playerScore = 0;
-let botScore = 0;
-let timeLeft = 0;
-let gameInterval = null;
-let botInterval = null;
-
-let totalAura = parseInt(localStorage.getItem('user_total_aura')) || 0;
-updateTotalAuraUI();
-
-function updateTotalAuraUI() {
-  document.getElementById('total-aura-count').innerText = totalAura.toLocaleString();
-}
-
-/* Логіка Таблиці Лідерів */
-const baseBotsList = [
-  { name: "duck228", aura: 256752 },
-  { name: "CORLIX", aura: 127658 },
-  { name: "B1RD", aura: 65732 },
-  { name: "GON-Donk666", aura: 321057 },
-  { name: "burns", aura: 1267 }
-];
-
-function openLeaderboard() {
-  const modal = document.getElementById('leaderboard-modal');
-  const listContainer = document.getElementById('leaderboard-list');
-  listContainer.innerHTML = '';
-  
-let tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
-let playerName = tgUser 
-  ? (tgUser.username ? `@${tgUser.username}` : tgUser.first_name) 
-  : "ти";
-
-let players = [...baseBotsList, { name: playerName, aura: totalAura, isPlayer: true }];
-players.sort((a, b) => b.aura - a.aura);
-  players.forEach((p, index) => {
-    const item = document.createElement('div');
-    item.className = `leader-item ${p.isPlayer ? 'you' : ''}`;
-    
-    let rankClass = '';
-    if (index === 0) rankClass = 'rank-1';
-    if (index === 1) rankClass = 'rank-2';
-    if (index === 2) rankClass = 'rank-3';
-
-    item.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <span class="rank ${rankClass}">#${index + 1}</span>
-        <span style="font-weight: bold;">${p.name}</span>
-      </div>
-      <span style="color: #38edf8; font-weight: 900;">${p.aura.toLocaleString()}</span>
-    `;
-    listContainer.appendChild(item);
-  });
-
-  modal.style.display = 'flex';
-}
-
-function closeLeaderboard() {
-  document.getElementById('leaderboard-modal').style.display = 'none';
-}
-
-function switchGameMode(mode) {
-  const normalBtn = document.getElementById('mode-normal-btn');
-  const compBtn = document.getElementById('mode-comp-btn');
-  const normalBlock = document.getElementById('normal-mode-block');
-  const compBlock = document.getElementById('comp-mode-block');
-  const totalAuraBadge = document.getElementById('total-aura-display');
-
-  if (mode === 'normal') {
-    normalBtn.classList.add('active');
-    compBtn.classList.remove('active');
-    normalBlock.style.display = 'block';
-    compBlock.style.display = 'none';
-    totalAuraBadge.style.display = 'none';
-  } else {
-    compBtn.classList.add('active');
-    normalBtn.classList.remove('active');
-    normalBlock.style.display = 'none';
-    compBlock.style.display = 'block';
-    totalAuraBadge.style.display = 'flex';
-  }
-}
-
-function showBotMenu() {
-  document.getElementById('comp-menu').style.display = 'none';
-  document.getElementById('bot-time-select').style.display = 'block';
-}
-
-function hideBotMenu() {
-  document.getElementById('bot-time-select').style.display = 'none';
-  document.getElementById('comp-menu').style.display = 'flex';
-}
-
-function selectTimeMode(seconds) {
-  selectedTime = seconds;
-  
-  document.getElementById('time-60').classList.remove('selected');
-  document.getElementById('time-40').classList.remove('selected');
-  document.getElementById('time-20').classList.remove('selected');
-  
-  document.getElementById(`time-${seconds}`).classList.add('selected');
-  document.getElementById('start-duel-btn').style.display = 'block';
-}
-
-function launchDuelGame() {
-  document.getElementById('bot-time-select').style.display = 'none';
-  document.getElementById('active-duel-screen').style.display = 'block';
-  
-  playerScore = 0;
-  botScore = 0;
-  timeLeft = selectedTime;
-  
-  document.getElementById('player-score').innerText = '0';
-  document.getElementById('bot-score').innerText = '0';
-  document.getElementById('time-left').innerText = timeLeft;
-  document.getElementById('duel-result').innerText = '';
-  document.getElementById('aura-bar-fill').style.width = '50%';
-  
-  document.getElementById('input-duel-word').disabled = false;
-  document.getElementById('send-word-btn').disabled = false;
-  document.getElementById('exit-duel-btn').style.display = 'none';
-
-  gameInterval = setInterval(() => {
-    timeLeft--;
-    document.getElementById('time-left').innerText = timeLeft;
-
-    if (timeLeft <= 0) {
-      endDuel();
+    function init() {
+      updateActiveSlotUI();
+      renderInventory();
+      generateWheelForSkin(selectedSkin);
     }
-  }, 1000);
 
-  botInterval = setInterval(() => {
-    if (Math.random() > 0.3) { 
-      botScore += Math.floor(Math.random() * 400) + 100;
-      updateDuelUI();
+    // Generate Wheel: 3 Losses + 3 DIFFERENT Win Skins (~2x Value)
+    function generateWheelForSkin(skin) {
+      if (!skin) return;
+
+      let possibleWins = SKIN_POOL.filter(s => s.price >= skin.price);
+      if (possibleWins.length < 3) possibleWins = SKIN_POOL;
+
+      let shuffled = [...possibleWins].sort(() => 0.5 - Math.random());
+      let win1 = shuffled[0] || skin;
+      let win2 = shuffled[1] || win1;
+      let win3 = shuffled[2] || win2;
+
+      const lossSector = { id: 0, name: 'SKIN LOST ❌', price: 0, isLoss: true };
+
+      currentWheelSkins = [
+        lossSector,
+        win1,
+        lossSector,
+        win2,
+        lossSector,
+        win3
+      ];
+
+      drawWheel(0);
     }
-  }, 800);
-}
 
-function submitDuelWord() {
-  const input = document.getElementById('input-duel-word');
-  const word = input.value.trim();
-  
-  if (!word) return;
-
-  const addedAura = Math.abs(getAuraScoreFromInput(word) % 800) + 200;
-  playerScore += addedAura;
-  
-  input.value = '';
-  playTickSound();
-  updateDuelUI();
-}
-
-function updateDuelUI() {
-  document.getElementById('player-score').innerText = playerScore.toLocaleString();
-  document.getElementById('bot-score').innerText = botScore.toLocaleString();
-  
-  const total = playerScore + botScore;
-  let percentage = 50;
-  
-  if (total > 0) {
-    percentage = Math.min(Math.max((playerScore / total) * 100, 5), 95);
-  }
-  
-  document.getElementById('aura-bar-fill').style.width = `${percentage}%`;
-}
-
-function endDuel() {
-  clearInterval(gameInterval);
-  clearInterval(botInterval);
-
-  document.getElementById('input-duel-word').disabled = true;
-  document.getElementById('send-word-btn').disabled = true;
-  document.getElementById('exit-duel-btn').style.display = 'block';
-
-  const resultText = document.getElementById('duel-result');
-
-  if (playerScore > botScore) {
-    const gainedAura = playerScore + botScore;
-    totalAura += gainedAura;
-    localStorage.setItem('user_total_aura', totalAura);
-    updateTotalAuraUI();
-
-    resultText.innerHTML = `🎉 Перемога!<br><span style="color: #38edf8; font-size: 17px;">+${gainedAura.toLocaleString()} AURA</span> (твоя + бота)`;
-    resultText.style.color = '#2ed573';
-    spawnConfetti();
-  } else if (botScore > playerScore) {
-    resultText.innerHTML = `💥 Поразка! Бот набрав більше аури.<br><span style="color: #ef4444; font-size: 14px;">+0 AURA</span>`;
-    resultText.style.color = '#ef4444';
-    playBadSound();
-  } else {
-    resultText.innerHTML = `🤝 Нічия! Сили виявилися рівними.<br><span style="color: #facc15; font-size: 14px;">+0 AURA</span>`;
-    resultText.style.color = '#facc15';
-  }
-}
-
-function exitDuel() {
-  document.getElementById('active-duel-screen').style.display = 'none';
-  document.getElementById('comp-menu').style.display = 'flex';
-}
-
-const auraTiers = [
-  { maxScore: 0, title: '💀 sub 3', color: '#ef4444', desc: 'лох, навіть у живчика більше аури ніж у тебе!', emoji: '🤡🗿', animClass: 'bad-aura-active', effect: 'badSound' },
-  { maxScore: 100000, title: '📉 Bot', color: '#f97316', desc: 'Нульова аура, ти ,бот.', emoji: '🤖📦', animClass: '', effect: null },
-  { maxScore: 220000, title: '⚡ default aura ', color: '#fbbf24', desc: 'звичайна дефолтна аура', emoji: '🙂⚡', animClass: '', effect: null },
-  { maxScore: 350000, title: '🤙 normal ', color: '#facc15', desc: 'ну чиста аура.', emoji: '😎🔥', animClass: 'tiger-aura-active', effect: null },
-  { maxScore: 500000, title: '🔥 MTN', color: '#ff5722', desc: 'Твоя аура звичайна!', emoji: '👺💥', animClass: 'tiger-aura-active', effect: null },
-  { maxScore: 650000, title: '💎 Briliant aura', color: '#06b6d4', desc: 'Чистий Aura farming', emoji: '💎🕶️', animClass: 'max-aura-active', effect: null },
-  { maxScore: 780000, title: '🔮 mega aura', color: '#a855f7', desc: 'Твоя аура потуууужна!', emoji: '🗿👑', animClass: 'max-aura-active', effect: 'confetti' },
-  { maxScore: 880000, title: '🪐 Галактичний бос', color: '#3b82f6', desc: 'Рівень аури пробиває атмосферу планети!', emoji: '🌌⚡', animClass: 'max-aura-active', effect: 'confetti' },
-  { maxScore: 960000, title: '👑 True adam', color: '#4ade80', desc: '100% аура ', emoji: '🤴🤑💰', animClass: 'max-aura-active', effect: 'phonk' },
-  { maxScore: Infinity, title: '✨ gigachad', color: '#38edf8', desc: 'Нереальний зашкал аури!', emoji: '👑⚡🪐', animClass: 'max-aura-active', effect: 'phonk' }
-];
-
-function getAuraScoreFromInput(str) {
-  let hash = 0;
-  const cleanStr = str.trim().toLowerCase();
-  for (let i = 0; i < cleanStr.length; i++) {
-    hash = ((hash << 5) - hash) + cleanStr.charCodeAt(i);
-    hash |= 0;
-  }
-  const min = -10000;
-  const max = 1000000;
-  const normalized = Math.abs(hash) % (max - min + 1);
-  return min + normalized;
-}
-
-function getAudioContext() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-  }
-  return audioCtx;
-}
-
-function playTickSound() {
-  try {
-    const ctx = getAudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(450 + Math.random() * 200, ctx.currentTime);
-    gain.gain.setValueAtTime(0.015, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.03);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.03);
-  } catch(e) {}
-}
-
-function playBadSound() {
-  try {
-    const ctx = getAudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(130, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.4);
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.4);
-  } catch(e) {}
-}
-
-function spawnConfetti() {
-  const container = document.getElementById('aura-widget-container');
-  const colors = ['#4ade80', '#38edf8', '#c084fc', '#facc15', '#ff007f'];
-  for (let i = 0; i < 35; i++) {
-    const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.left = Math.random() * 100 + '%';
-    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-    confetti.style.animationDuration = (1 + Math.random() * 1.5) + 's';
-    container.appendChild(confetti);
-    setTimeout(() => confetti.remove(), 2500);
-  }
-}
-
-function triggerFlash() {
-  const flash = document.getElementById('flash-overlay');
-  flash.style.animation = 'none';
-  flash.offsetHeight;
-  flash.style.animation = 'flashOverlay 0.4s ease-out';
-}
-
-function switchTab(tab) {
-  activeTab = tab;
-  document.getElementById('tab-dob').style.display = tab === 'dob' ? 'block' : 'none';
-  document.getElementById('tab-name').style.display = tab === 'name' ? 'block' : 'none';
-  document.getElementById('tab-other').style.display = tab === 'other' ? 'block' : 'none';
-
-  document.getElementById('btn-dob').style.background = tab === 'dob' ? '#9333ea' : '#1e1b4b';
-  document.getElementById('btn-dob').style.color = tab === 'dob' ? '#fff' : '#a78bfa';
-  
-  document.getElementById('btn-name').style.background = tab === 'name' ? '#9333ea' : '#1e1b4b';
-  document.getElementById('btn-name').style.color = tab === 'name' ? '#fff' : '#a78bfa';
-
-  document.getElementById('btn-other').style.background = tab === 'other' ? '#9333ea' : '#1e1b4b';
-  document.getElementById('btn-other').style.color = tab === 'other' ? '#fff' : '#a78bfa';
-}
-
-function checkAura() {
-  if (isProcessing) return;
-  getAudioContext();
-
-  let val = '';
-  if (activeTab === 'dob') val = document.getElementById('input-dob').value;
-  if (activeTab === 'name') val = document.getElementById('input-name').value.trim();
-  if (activeTab === 'other') val = document.getElementById('input-other').value.trim();
-
-  if (!val) {
-    alert('Заповни поле!');
-    return;
-  }
-
-  const phonkTrack = document.getElementById('phonk-audio');
-  if (phonkTrack) {
-    phonkTrack.pause();
-    phonkTrack.currentTime = 0;
-  }
-
-  isProcessing = true;
-  const btn = document.getElementById('calc-btn');
-  btn.style.opacity = '0.6';
-  btn.innerText = 'Нараховуємо... 💰';
-
-  const targetScore = getAuraScoreFromInput(val);
-  const tier = auraTiers.find(t => targetScore <= t.maxScore) || auraTiers[auraTiers.length - 1];
-
-  const resultBox = document.getElementById('result-box');
-  const pointsEl = document.getElementById('aura-points');
-  const titleEl = document.getElementById('aura-title');
-  const descEl = document.getElementById('aura-desc');
-  const emojiEl = document.getElementById('meme-emoji');
-
-  resultBox.style.display = 'block';
-  resultBox.classList.remove('max-aura-active', 'tiger-aura-active', 'bad-aura-active');
-
-  titleEl.style.color = tier.color;
-  titleEl.innerText = tier.title;
-  descEl.innerText = tier.desc;
-  emojiEl.innerText = tier.emoji;
-  pointsEl.style.color = tier.color;
-
-  if (tier.animClass) {
-    resultBox.classList.add(tier.animClass);
-  }
-
-  if (tier.effect === 'badSound') {
-    playBadSound();
-  } else if (tier.effect === 'confetti') {
-    spawnConfetti();
-  } else if (tier.effect === 'phonk') {
-    triggerFlash();
-    spawnConfetti();
-    if (phonkTrack) {
-      phonkTrack.currentTime = 20;
-      phonkTrack.volume = 0.95;
-      phonkTrack.play().catch(e => console.log(e));
+    function rerollWheelSkins() {
+      if (isSpinning || !selectedSkin) return;
+      generateWheelForSkin(selectedSkin);
+      showToast('🔄 Wheel Skins Changed!');
     }
-  }
 
-  const duration = 2200; 
-  const startTime = performance.now();
+    function drawWheel(rotationAngle) {
+      const numSlices = 6;
+      const sliceAngle = (2 * Math.PI) / numSlices;
+      const radius = canvas.width / 2;
 
-  function animateInGameMoney(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    
-    const easeProgress = 1 - Math.pow(1 - progress, 2.5);
-    const currentVal = Math.floor(easeProgress * targetScore);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(radius, radius);
+      ctx.rotate(rotationAngle);
 
-    const prefix = targetScore >= 0 ? '+' : '';
-    pointsEl.innerText = `${prefix}${currentVal.toLocaleString()} AURA`;
-    
-    playTickSound();
+      for (let i = 0; i < numSlices; i++) {
+        const angle = i * sliceAngle;
+        const item = currentWheelSkins[i];
 
-    if (progress < 1) {
-      requestAnimationFrame(animateInGameMoney);
-    } else {
-      isProcessing = false;
-      btn.style.opacity = '1';
-      btn.innerText = 'Дізнатися ауру 🚀';
-      pointsEl.innerText = `${prefix}${targetScore.toLocaleString()} AURA`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.arc(0, 0, radius - 10, angle, angle + sliceAngle);
+        ctx.closePath();
+        
+        ctx.fillStyle = item.isLoss ? '#1c0d0d' : '#112217';
+        ctx.fill();
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#0b0b0d';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 5, angle, angle + sliceAngle);
+        ctx.lineWidth = 6;
+        ctx.strokeStyle = item.isLoss ? '#ff3333' : '#00ff66';
+        ctx.stroke();
+
+        ctx.save();
+        ctx.rotate(angle + sliceAngle / 2);
+        ctx.textAlign = 'right';
+
+        if (item.isLoss) {
+          ctx.fillStyle = '#ff4444';
+          ctx.font = 'bold 20px Segoe UI';
+          ctx.fillText(item.name, radius - 35, 7);
+        } else {
+          ctx.fillStyle = '#00ff66';
+          ctx.font = 'bold 16px Segoe UI';
+          const displayName = item.name.length > 13 ? item.name.substring(0, 13) + '..' : item.name;
+          ctx.fillText(displayName, radius - 35, 7);
+        }
+
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(0, 0, 42, 0, 2 * Math.PI);
+      ctx.fillStyle = '#121216';
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#ff7700';
+      ctx.stroke();
+
+      ctx.restore();
     }
-  }
 
-  requestAnimationFrame(animateInGameMoney);
-}
-</script>
+    function spinWheel() {
+      if (isSpinning || !selectedSkin) return;
 
+      isSpinning = true;
+      document.getElementById('spinBtn').disabled = true;
+
+      const stakedSkinRef = selectedSkin;
+
+      const numSlices = 6;
+      const sliceAngle = (2 * Math.PI) / numSlices;
+      const winningIndex = Math.floor(Math.random() * numSlices);
+      const outcome = currentWheelSkins[winningIndex];
+
+      const targetSliceCenter = (winningIndex * sliceAngle) + (sliceAngle / 2);
+      const randomRounds = 5 + Math.floor(Math.random() * 3);
+      const targetRotation = (randomRounds * 2 * Math.PI) + ((3 * Math.PI / 2) - targetSliceCenter);
+
+      const startTime = performance.now();
+      const spinDuration = 4000;
+
+      function animateSpin(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / spinDuration, 1);
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const currentAngle = currentRotation + (targetRotation - currentRotation) * easeOut;
+
+        drawWheel(currentAngle);
+
+        if (progress < 1) {
+          requestAnimationFrame(animateSpin);
+        } else {
+          currentRotation = targetRotation % (2 * Math.PI);
+          isSpinning = false;
+          document.getElementById('spinBtn').disabled = false;
+
+          const stakedIndex = userInventory.findIndex(i => i.instanceId === stakedSkinRef.instanceId);
+          if (stakedIndex !== -1) {
+            userInventory.splice(stakedIndex, 1);
+          }
+
+          if (outcome.isLoss) {
+            showToast(`💥 YOU LOST YOUR ${stakedSkinRef.name}!`);
+          } else {
+            userInventory.unshift({ ...outcome, instanceId: Date.now() });
+            showToast(`🎉 WON: ${outcome.name}!`);
+          }
+
+          selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
+
+          updateActiveSlotUI();
+          renderInventory();
+          generateWheelForSkin(selectedSkin);
+        }
+      }
+
+      requestAnimationFrame(animateSpin);
+    }
+
+    function updateActiveSlotUI() {
+      if (!selectedSkin) {
+        document.getElementById('slotName').innerText = 'No Skin Selected';
+        document.getElementById('slotPrice').innerText = '$0';
+        document.getElementById('spinBtn').disabled = true;
+        return;
+      }
+      document.getElementById('slotName').innerText = selectedSkin.name;
+      document.getElementById('slotPrice').innerText = '$' + selectedSkin.price;
+      document.getElementById('spinBtn').disabled = false;
+      document.getElementById('invCount').innerText = userInventory.length;
+    }
+
+    function renderInventory() {
+      const grid = document.getElementById('inventoryGrid');
+      grid.innerHTML = '';
+
+      userInventory.forEach((skin) => {
+        const card = document.createElement('div');
+        card.className = `item-card ${selectedSkin && selectedSkin.instanceId === skin.instanceId ? 'selected' : ''}`;
+        card.onclick = () => selectSkinFromInventory(skin);
+
+        card.innerHTML = `
+          <div class="rarity-bar ${skin.rarity}"></div>
+          <div class="name">${skin.name}</div>
+          <div class="price">$${skin.price}</div>
+        `;
+        grid.appendChild(card);
+      });
+
+      document.getElementById('invCount').innerText = userInventory.length;
+    }
+
+    function selectSkinFromInventory(skin) {
+      if (isSpinning) return;
+      selectedSkin = skin;
+      updateActiveSlotUI();
+      renderInventory();
+      generateWheelForSkin(selectedSkin);
+      toggleModal('inventoryModal', false);
+    }
+
+    function toggleModal(modalId, show) {
+      const overlay = document.getElementById(modalId);
+      if (show) overlay.classList.add('active');
+      else overlay.classList.remove('active');
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('resultToast');
+      toast.innerText = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    init();
+  </script>
 </body>
 </html>
