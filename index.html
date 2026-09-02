@@ -44,21 +44,69 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      padding: 15px 0;
-      text-align: center;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .balance-badge {
+      background: rgba(18, 18, 22, 0.9);
+      border: 1px solid rgba(255, 119, 0, 0.5);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #ff8800;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(255, 119, 0, 0.2);
     }
 
     .logo {
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 900;
       letter-spacing: 3px;
       color: #ffffff;
       text-shadow: 0 0 12px rgba(255, 120, 0, 0.6);
       text-transform: uppercase;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .logo span {
       color: #ff7700;
+    }
+
+    .nav-tabs {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      background: rgba(18, 18, 22, 0.9);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #888888;
+      padding: 6px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: 0.2s;
+    }
+
+    .tab-btn.active {
+      background: #ff7700;
+      color: #ffffff;
+      box-shadow: 0 0 10px rgba(255, 119, 0, 0.4);
     }
 
     .app-container {
@@ -72,6 +120,17 @@
       flex-grow: 1;
       justify-content: center;
       padding: 0 15px;
+    }
+
+    .tab-content {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .tab-content.active {
+      display: flex;
     }
 
     .wheel-wrapper {
@@ -346,6 +405,44 @@
       font-size: 14px;
       font-weight: 800;
       color: #ff8800;
+      margin-bottom: 8px;
+    }
+
+    .btn-action-card {
+      background: linear-gradient(135deg, #ff8800 0%, #e64a00 100%);
+      border: none;
+      color: #ffffff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .deposit-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .deposit-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 119, 0, 0.4);
+      color: #ffffff;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    .deposit-btn:hover {
+      background: rgba(255, 119, 0, 0.2);
     }
 
     .result-toast {
@@ -385,34 +482,56 @@
   <div class="glow-bg"></div>
 
   <header>
+    <div class="balance-badge" onclick="toggleModal('depositModal', true)">$ <span id="userBalance">100</span></div>
     <div class="logo">SITRO <span>DROP</span></div>
   </header>
 
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('skins')">Skins</button>
+    <button class="tab-btn" onclick="switchTab('shop')">Shop</button>
+    <button class="tab-btn" onclick="switchTab('sale')">Sale</button>
+  </div>
+
   <div class="app-container">
-    <div class="wheel-wrapper">
-      <div class="wheel-pointer"></div>
-      <canvas id="wheelCanvas" width="560" height="560"></canvas>
-    </div>
-
-    <button class="btn-reroll" onclick="rerollWheelSkins()">🔄 Change Wheel Skins</button>
-
-    <div class="selected-slot-card">
-      <div class="slot-details">
-        <div class="title">Staked Skin</div>
-        <div class="name" id="slotName">Select Skin</div>
+    <!-- SKINS / WHEEL TAB -->
+    <div class="tab-content active" id="tab-skins">
+      <div class="wheel-wrapper">
+        <div class="wheel-pointer"></div>
+        <canvas id="wheelCanvas" width="560" height="560"></canvas>
       </div>
-      <div class="slot-price" id="slotPrice">$0</div>
+
+      <button class="btn-reroll" onclick="rerollWheelSkins()">Change Wheel Skins</button>
+
+      <div class="selected-slot-card">
+        <div class="slot-details">
+          <div class="title">Staked Skin</div>
+          <div class="name" id="slotName">Select Skin</div>
+        </div>
+        <div class="slot-price" id="slotPrice">$0</div>
+      </div>
+
+      <button class="btn-spin" id="spinBtn" onclick="spinWheel()">SPIN WHEEL</button>
     </div>
 
-    <button class="btn-spin" id="spinBtn" onclick="spinWheel()">SPIN WHEEL</button>
+    <!-- SHOP TAB -->
+    <div class="tab-content" id="tab-shop">
+      <div style="width:100%; max-width:320px; font-size:13px; color:#888; margin-bottom:10px; font-weight:700;">Buy skins with your balance:</div>
+      <div class="inventory-grid" id="shopGrid" style="width:100%; max-height: 60vh;"></div>
+    </div>
+
+    <!-- SALE TAB -->
+    <div class="tab-content" id="tab-sale">
+      <div style="width:100%; max-width:320px; font-size:13px; color:#888; margin-bottom:10px; font-weight:700;">Sell your inventory skins for exact price:</div>
+      <div class="inventory-grid" id="saleGrid" style="width:100%; max-height: 60vh;"></div>
+    </div>
   </div>
 
   <div class="bottom-bar">
     <button class="btn-inventory" onclick="toggleModal('inventoryModal', true)">
-      <span>🎒</span> INVENTORY (<span id="invCount">0</span>)
+      INVENTORY (<span id="invCount">0</span>)
     </button>
     <a href="https://store.steampowered.com/tags/da/Inventarstyring/?l=russian&snr=1_5_9__409" target="_blank" class="btn-steam-link">
-      📥 Add from Steam
+      Add from Steam
     </a>
   </div>
 
@@ -427,10 +546,24 @@
     </div>
   </div>
 
+  <!-- Deposit Modal -->
+  <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
+    <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 50vh;">
+      <div class="sheet-header">
+        <div class="sheet-title">Top Up Balance</div>
+        <button class="btn-close" onclick="toggleModal('depositModal', false)">&times;</button>
+      </div>
+      <div class="deposit-options">
+        <a href="https://www.visa.com" target="_blank" class="deposit-btn">Visa</a>
+        <a href="https://www.mastercard.com" target="_blank" class="deposit-btn">Mastercard</a>
+        <a href="https://example.com" target="_blank" class="deposit-btn" onclick="handleMoreDeposit(event)">More (Musor Drop +$1000)</a>
+      </div>
+    </div>
+  </div>
+
   <div class="result-toast" id="resultToast">RESULTS</div>
 
   <script>
-    // CS2 Skins Database
     const SKIN_POOL = [
       { id: 1, name: 'P250 | Sand Dune', price: 2, rarity: 'rarity-consumer' },
       { id: 2, name: 'AK-47 | Safari Mesh', price: 10, rarity: 'rarity-consumer' },
@@ -443,7 +576,7 @@
       { id: 9, name: 'Karambit | Doppler', price: 800, rarity: 'rarity-gold' }
     ];
 
-    // Initial Inventory: Only ONE cheap starter skin ($2)
+    let userBalance = 100;
     let userInventory = [
       { ...SKIN_POOL[0], instanceId: 101 }
     ];
@@ -457,24 +590,61 @@
     const ctx = canvas.getContext('2d');
 
     function init() {
+      updateBalanceUI();
       updateActiveSlotUI();
       renderInventory();
+      renderShop();
+      renderSale();
       generateWheelForSkin(selectedSkin);
     }
 
-    // Generate Wheel: 3 Losses + 3 DIFFERENT Win Skins (~2x Value)
+    function updateBalanceUI() {
+      document.getElementById('userBalance').innerText = userBalance;
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      if (tabName === 'skins') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-skins').classList.add('active');
+      } else if (tabName === 'shop') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-shop').classList.add('active');
+        renderShop();
+      } else if (tabName === 'sale') {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tab-sale').classList.add('active');
+        renderSale();
+      }
+    }
+
+    function handleMoreDeposit(e) {
+      e.preventDefault();
+      userBalance += 1000;
+      updateBalanceUI();
+      showToast('Added $1000 from Musor Drop!');
+      toggleModal('depositModal', false);
+      window.open('https://example.com', '_blank');
+    }
+
+    // Wheel generation: 3 losses + 3 wins (one slightly more expensive, one much more expensive, one x2)
     function generateWheelForSkin(skin) {
       if (!skin) return;
 
-      let possibleWins = SKIN_POOL.filter(s => s.price >= skin.price);
-      if (possibleWins.length < 3) possibleWins = SKIN_POOL;
+      const p = skin.price;
 
-      let shuffled = [...possibleWins].sort(() => 0.5 - Math.random());
-      let win1 = shuffled[0] || skin;
-      let win2 = shuffled[1] || win1;
-      let win3 = shuffled[2] || win2;
+      // 1. Slightly more expensive (~1.2x - 1.3x)
+      let win1 = SKIN_POOL.find(s => s.price > p && s.price <= p * 1.5) || SKIN_POOL.find(s => s.price > p) || skin;
+      
+      // 2. Much more expensive (~1.6x - 1.9x)
+      let win2 = SKIN_POOL.find(s => s.price > p * 1.5 && s.price < p * 2) || SKIN_POOL.find(s => s.price > p) || win1;
 
-      const lossSector = { id: 0, name: 'SKIN LOST ❌', price: 0, isLoss: true };
+      // 3. x2 to price (~2x or higher)
+      let win3 = SKIN_POOL.find(s => s.price >= p * 2) || SKIN_POOL[SKIN_POOL.length - 1];
+
+      const lossSector = { id: 0, name: 'SKIN LOST', price: 0, isLoss: true };
 
       currentWheelSkins = [
         lossSector,
@@ -491,7 +661,7 @@
     function rerollWheelSkins() {
       if (isSpinning || !selectedSkin) return;
       generateWheelForSkin(selectedSkin);
-      showToast('🔄 Wheel Skins Changed!');
+      showToast('Wheel Skins Changed');
     }
 
     function drawWheel(rotationAngle) {
@@ -595,16 +765,17 @@
           }
 
           if (outcome.isLoss) {
-            showToast(`💥 YOU LOST YOUR ${stakedSkinRef.name}!`);
+            showToast('YOU LOST YOUR ' + stakedSkinRef.name + '!');
           } else {
             userInventory.unshift({ ...outcome, instanceId: Date.now() });
-            showToast(`🎉 WON: ${outcome.name}!`);
+            showToast('WON: ' + outcome.name + '!');
           }
 
           selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
 
           updateActiveSlotUI();
           renderInventory();
+          renderSale();
           generateWheelForSkin(selectedSkin);
         }
       }
@@ -631,7 +802,7 @@
 
       userInventory.forEach((skin) => {
         const card = document.createElement('div');
-        card.className = `item-card ${selectedSkin && selectedSkin.instanceId === skin.instanceId ? 'selected' : ''}`;
+        card.className = 'item-card ' + (selectedSkin && selectedSkin.instanceId === skin.instanceId ? 'selected' : '');
         card.onclick = () => selectSkinFromInventory(skin);
 
         card.innerHTML = `
@@ -643,6 +814,85 @@
       });
 
       document.getElementById('invCount').innerText = userInventory.length;
+    }
+
+    function renderShop() {
+      const grid = document.getElementById('shopGrid');
+      grid.innerHTML = '';
+
+      SKIN_POOL.forEach((skin) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+
+        card.innerHTML = `
+          <div class="rarity-bar ${skin.rarity}"></div>
+          <div class="name">${skin.name}</div>
+          <div class="price">$${skin.price}</div>
+          <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">Buy</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function buySkin(event, skinId) {
+      event.stopPropagation();
+      const skinToBuy = SKIN_POOL.find(s => s.id === skinId);
+      if (!skinToBuy) return;
+
+      if (userBalance >= skinToBuy.price) {
+        userBalance -= skinToBuy.price;
+        updateBalanceUI();
+        userInventory.push({ ...skinToBuy, instanceId: Date.now() });
+        renderInventory();
+        renderSale();
+        showToast('Bought ' + skinToBuy.name + '!');
+      } else {
+        showToast('Not enough balance!');
+      }
+    }
+
+    function renderSale() {
+      const grid = document.getElementById('saleGrid');
+      grid.innerHTML = '';
+
+      if (userInventory.length === 0) {
+        grid.innerHTML = '<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">No skins to sell</div>';
+        return;
+      }
+
+      userInventory.forEach((skin) => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+
+        card.innerHTML = `
+          <div class="rarity-bar ${skin.rarity}"></div>
+          <div class="name">${skin.name}</div>
+          <div class="price">$${skin.price}</div>
+          <button class="btn-action-card" onclick="sellSkin(event, ${skin.instanceId})">Sell ($${skin.price})</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function sellSkin(event, instanceId) {
+      event.stopPropagation();
+      const index = userInventory.findIndex(i => i.instanceId === instanceId);
+      if (index === -1) return;
+
+      const soldSkin = userInventory[index];
+      userBalance += soldSkin.price;
+      updateBalanceUI();
+      userInventory.splice(index, 1);
+
+      if (selectedSkin && selectedSkin.instanceId === instanceId) {
+        selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
+        updateActiveSlotUI();
+        generateWheelForSkin(selectedSkin);
+      }
+
+      renderInventory();
+      renderSale();
+      showToast('Sold ' + soldSkin.name + ' for $' + soldSkin.price + '!');
     }
 
     function selectSkinFromInventory(skin) {
@@ -670,4 +920,4 @@
     init();
   </script>
 </body>
-</html>
+  </html>
