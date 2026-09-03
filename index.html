@@ -319,7 +319,7 @@
       cursor: pointer;
     }
 
-    /* ОСНОВНІ ВАКЛАДКИ МОДАЛКИ (SKINS, SHOP, SALE) */
+    /* ОСНОВНІ ТАБИ (Skins / Shop / Sale) */
     .nav-tabs {
       display: flex;
       gap: 8px;
@@ -349,45 +349,6 @@
       background: #ff7700;
       color: #ffffff;
       box-shadow: 0 0 10px rgba(255, 119, 0, 0.4);
-    }
-
-    /* 5 ВКТАДОК КАТЕГОРІЙ В SHOP (ФІКСОВАНІ, НЕ ЗМЕНШУЮТЬСЯ) */
-    .shop-category-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-      background: rgba(0, 0, 0, 0.3);
-      padding: 6px;
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .shop-category-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .shop-cat-btn {
-      flex-shrink: 0; /* ЗАБОРОНЯЄ ЗМЕНШЕННЯ */
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      color: #aaaaaa;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: all 0.2s;
-    }
-
-    .shop-cat-btn.active {
-      background: rgba(255, 119, 0, 0.2);
-      border-color: #ff7700;
-      color: #ff8800;
-      box-shadow: 0 0 8px rgba(255, 119, 0, 0.3);
     }
 
     .tab-content {
@@ -453,6 +414,55 @@
       font-weight: 800;
       color: #ff8800;
       margin-bottom: 8px;
+    }
+
+    /* СТИЛІ ДЛЯ КАРТОК-КАТЕГОРІЙ В SHOP */
+    .category-card {
+      background: linear-gradient(135deg, rgba(35, 35, 45, 0.9) 0%, rgba(20, 20, 26, 0.9) 100%);
+      border: 1px solid rgba(255, 119, 0, 0.3);
+      border-radius: 14px;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    .category-card:active {
+      transform: scale(0.96);
+      border-color: #ff7700;
+    }
+
+    .category-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .category-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-back-categories {
+      background: rgba(255, 119, 0, 0.15);
+      border: 1px solid #ff7700;
+      color: #ff7700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
     }
 
     .btn-action-card {
@@ -532,7 +542,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* CLICKER SCREEN */
+    /* TAPPER SCREEN WITH POLKA DOTS */
     .clicker-modal {
       position: fixed;
       top: 0;
@@ -643,7 +653,6 @@
     </a>
   </div>
 
-  <!-- Inventory & Shop Sheet Modal -->
   <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()">
       <div class="sheet-header">
@@ -657,31 +666,23 @@
         <button class="tab-btn" onclick="switchTab('sale')">Sale</button>
       </div>
 
-      <!-- SKINS TAB -->
       <div class="tab-content active" id="tab-skins">
         <div class="inventory-grid" id="inventoryGrid"></div>
       </div>
 
-      <!-- SHOP TAB (З 5 ВКЛАДКАМИ КАТЕГОРІЙ) -->
       <div class="tab-content" id="tab-shop">
-        <div class="shop-category-tabs">
-          <button class="shop-cat-btn active" onclick="switchShopCategory(event, 'all')">All</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'pistols')">Pistols</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'rifles')">Rifles</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'knives')">Knives</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'smg')">Heavy/SMG</button>
-        </div>
+        <button class="btn-back-categories" id="backCategoriesBtn" onclick="openCategoriesView()">
+          ← Back to Categories
+        </button>
         <div class="inventory-grid" id="shopGrid"></div>
       </div>
 
-      <!-- SALE TAB -->
       <div class="tab-content" id="tab-sale">
         <div class="inventory-grid" id="saleGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- Deposit Modal -->
   <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 60vh;">
       <div class="sheet-header">
@@ -705,7 +706,6 @@
     </div>
   </div>
 
-  <!-- CLICKER SCREEN -->
   <div class="clicker-modal" id="clickerModal">
     <div class="clicker-header">$<span id="clickerBalance">0</span></div>
     <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
@@ -779,7 +779,7 @@
     let isSpinning = false;
     let currentWheelSkins = [];
     let currentRotation = 0;
-    let activeShopCategory = 'all';
+    let activeShopCategory = null; // null = показуємо 5 плиток категорій
 
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
@@ -853,12 +853,13 @@
       }
     }
 
-    function switchShopCategory(e, cat) {
-      activeShopCategory = cat;
-      document.querySelectorAll('.shop-cat-btn').forEach(btn => btn.classList.remove('active'));
-      if (e && e.target) {
-        e.target.classList.add('active');
-      }
+    function selectCategory(catKey) {
+      activeShopCategory = catKey;
+      renderShop();
+    }
+
+    function openCategoriesView() {
+      activeShopCategory = null;
       renderShop();
     }
 
@@ -1069,24 +1070,54 @@
 
     function renderShop() {
       const grid = document.getElementById('shopGrid');
+      const backBtn = document.getElementById('backCategoriesBtn');
       grid.innerHTML = '';
 
-      const filtered = activeShopCategory === 'all' 
-        ? SKIN_POOL 
-        : SKIN_POOL.filter(s => s.category === activeShopCategory);
+      if (activeShopCategory === null) {
+        // ПОКАЗУЄМО 5 ПЛИТОК КАТЕГОРІЙ
+        backBtn.style.display = 'none';
 
-      filtered.forEach((skin) => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
+        const categories = [
+          { key: 'pistols', title: 'Pistols', icon: '🔫' },
+          { key: 'rifles', title: 'Rifles', icon: '🎯' },
+          { key: 'knives', title: 'Knives', icon: '🔪' },
+          { key: 'smg', title: 'Heavy / SMG', icon: '💥' },
+          { key: 'all', title: 'All Skins', icon: '📦' }
+        ];
 
-        card.innerHTML = `
-          <div class="rarity-bar ${skin.rarity}"></div>
-          <div class="name">${skin.name}</div>
-          <div class="price">$${skin.price}</div>
-          <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">Buy</button>
-        `;
-        grid.appendChild(card);
-      });
+        categories.forEach(cat => {
+          const card = document.createElement('div');
+          card.className = 'category-card';
+          card.onclick = () => selectCategory(cat.key);
+
+          card.innerHTML = `
+            <div class="category-icon">${cat.icon}</div>
+            <div class="category-title">${cat.title}</div>
+          `;
+          grid.appendChild(card);
+        });
+
+      } else {
+        // ПОКАЗУЄМО СКІНИ ОБРАНОЇ КАТЕГОРІЇ
+        backBtn.style.display = 'inline-flex';
+
+        const filtered = activeShopCategory === 'all' 
+          ? SKIN_POOL 
+          : SKIN_POOL.filter(s => s.category === activeShopCategory);
+
+        filtered.forEach((skin) => {
+          const card = document.createElement('div');
+          card.className = 'item-card';
+
+          card.innerHTML = `
+            <div class="rarity-bar ${skin.rarity}"></div>
+            <div class="name">${skin.name}</div>
+            <div class="price">$${skin.price}</div>
+            <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">Buy</button>
+          `;
+          grid.appendChild(card);
+        });
+      }
     }
 
     function buySkin(event, skinId) {
