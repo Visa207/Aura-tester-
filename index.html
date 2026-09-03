@@ -853,7 +853,7 @@
           <span class="card-badge">💳</span> Mastercard
         </a>
         <button class="deposit-btn" id="clickForMoneyBtn" style="display: none; background: rgba(255,215,0,0.15); border-color: #ffd700; color: #ffd700;" onclick="openClicker()">
-          💰 Click For money
+            Click For money
         </button>
         <a href="https://example.com" target="_blank" class="deposit-btn">
           More
@@ -865,7 +865,7 @@
   <!-- TAPPER SCREEN -->
   <div class="clicker-modal" id="clickerModal">
     <div class="clicker-header"><span class="curr-sym">$</span><span id="clickerBalance">0</span></div>
-    <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
+    <div class="clicker-coin" onclick="tapMoney(event)"> </div>
     <button class="btn-clicker-close" id="btnClickerClose" onclick="closeClicker()">BACK TO GAME</button>
   </div>
 
@@ -1347,11 +1347,11 @@
         backBtn.style.display = 'none';
 
         const categories = [
-          { key: 'pistols', title: 'Pistols', icon: '🔫' },
-          { key: 'rifles', title: 'Rifles', icon: '🎯' },
-          { key: 'knives', title: 'Knives', icon: '🔪' },
-          { key: 'smg', title: 'Heavy / SMG', icon: '💥' },
-          { key: 'all', title: 'All Skins', icon: '📦' }
+          { key: 'pistols', title: 'Pistols', icon: ' ' },
+          { key: 'rifles', title: 'Rifles', icon: ' ' },
+          { key: 'knives', title: 'Knives', icon: ' ' },
+          { key: 'smg', title: 'Heavy / SMG', icon: ' ' },
+          { key: 'all', title: 'All Skins', icon: ' ' }
         ];
 
         categories.forEach(cat => {
@@ -1481,7 +1481,7 @@
     }
 
     function tapMoney(e) {
-      userBalance = Number((userBalance + 1).toFixed(2));
+      userBalance = Number((userBalance + 0.1).toFixed(2));
       updateBalanceUI();
       saveDataToTelegram();
     }
