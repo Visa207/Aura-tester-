@@ -45,56 +45,10 @@
       position: relative;
       z-index: 10;
       width: 100%;
-      padding: 12px 15px;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(14, 14, 18, 0.6);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    /* TELEGRAM PROFILE IN HEADER */
-    .user-profile-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 4px 10px 4px 4px;
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      transition: 0.2s;
-    }
-
-    .user-profile-bar:active {
-      transform: scale(0.96);
-      background: rgba(255, 119, 0, 0.15);
-    }
-
-    .user-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #2a2a35;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: #ff8800;
-      border: 1px solid #ff7700;
-    }
-
-    .user-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #3b99fc;
-      max-width: 90px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .balance-badge {
@@ -110,16 +64,37 @@
     }
 
     .logo {
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 900;
       letter-spacing: 2px;
       color: #ffffff;
       text-shadow: 0 0 12px rgba(255, 120, 0, 0.6);
       text-transform: uppercase;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
     }
 
     .logo span {
       color: #ff7700;
+    }
+
+    /* TELEGRAM PROFILE AVATAR IN HEADER */
+    .header-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #ff7700;
+      object-fit: cover;
+      cursor: pointer;
+      background: #1a1a22;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      color: #ff8800;
+      box-shadow: 0 0 10px rgba(255, 119, 0, 0.3);
     }
 
     .app-container {
@@ -132,7 +107,7 @@
       align-items: center;
       flex-grow: 1;
       justify-content: center;
-      padding: 10px 15px 0 15px;
+      padding: 0 15px;
     }
 
     .wheel-wrapper {
@@ -275,6 +250,11 @@
       gap: 8px;
       cursor: pointer;
       box-shadow: 0 0 12px rgba(255, 120, 0, 0.2);
+    }
+
+    .btn-inventory:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-steam-link {
@@ -513,6 +493,100 @@
       width: 100%;
     }
 
+    /* PROFILE STYLES */
+    .profile-user-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 119, 0, 0.2);
+      margin-bottom: 16px;
+    }
+
+    .profile-avatar-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 2px solid #ff7700;
+      object-fit: cover;
+      background: #1a1a22;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #ff8800;
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 800;
+      color: #2b82c9;
+    }
+
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .setting-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .setting-select {
+      background: #1a1a22;
+      color: #ff8800;
+      border: 1px solid rgba(255, 119, 0, 0.4);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .privacy-link-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #aaaaaa;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .privacy-content {
+      display: none;
+      font-size: 12px;
+      color: #888888;
+      line-height: 1.5;
+      background: rgba(0,0,0,0.3);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
     .deposit-options {
       display: flex;
       flex-direction: column;
@@ -578,6 +652,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    /* TAPPER SCREEN WITH POLKA DOTS */
     .clicker-modal {
       position: fixed;
       top: 0;
@@ -643,97 +718,6 @@
       box-shadow: 0 0 15px rgba(0,0,0,0.8);
     }
 
-    /* TELEGRAM PROFILE & SETTINGS MODAL */
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 20px;
-    }
-
-    .profile-card-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #252530;
-      border: 2px solid #ff7700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      font-weight: bold;
-      color: #ff8800;
-    }
-
-    .profile-card-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #2ba2fb;
-    }
-
-    .settings-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .setting-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .setting-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: #dddddd;
-    }
-
-    .setting-select {
-      background: #1a1a22;
-      border: 1px solid #ff7700;
-      color: #ffffff;
-      padding: 6px 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      outline: none;
-    }
-
-    .privacy-btn {
-      margin-top: 10px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #aaaaaa;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-    }
-
-    .privacy-text {
-      font-size: 12px;
-      color: #aaaaaa;
-      line-height: 1.5;
-      overflow-y: auto;
-      max-height: 300px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 12px;
-      border-radius: 10px;
-    }
-
     .rarity-consumer { background-color: #b0c3d9; }
     .rarity-industrial { background-color: #5e98d9; }
     .rarity-restricted { background-color: #8847ff; }
@@ -747,16 +731,9 @@
   <div class="glow-bg"></div>
 
   <header>
-    <div class="user-profile-bar" onclick="toggleModal('profileModal', true)">
-      <div class="user-avatar" id="headerAvatar">V</div>
-      <div class="user-name" id="headerUsername">Visa207</div>
-    </div>
-
+    <div class="balance-badge" onclick="toggleModal('depositModal', true)"><span class="curr-sym">$</span> <span id="userBalance">10</span></div>
     <div class="logo">SITRO <span>DROP</span></div>
-
-    <div class="balance-badge" onclick="toggleModal('depositModal', true)">
-      <span id="currSymbol">$</span> <span id="userBalance">10</span>
-    </div>
+    <div id="headerAvatar" class="header-avatar" onclick="toggleModal('profileModal', true)">V</div>
   </header>
 
   <div class="app-container">
@@ -769,10 +746,10 @@
 
     <div class="selected-slot-card">
       <div class="slot-details">
-        <div class="title" id="txtStakedSkin">Staked Skin</div>
+        <div class="title" id="lblStakedSkin">Staked Skin</div>
         <div class="name" id="slotName">Select Skin</div>
       </div>
-      <div class="slot-price"><span class="curr-symb">$</span><span id="slotPrice">0</span></div>
+      <div class="slot-price"><span class="curr-sym">$</span><span id="slotPrice">0</span></div>
     </div>
 
     <button class="btn-spin" id="spinBtn" onclick="spinWheel()">SPIN WHEEL</button>
@@ -780,7 +757,7 @@
 
   <div class="bottom-bar">
     <button class="btn-inventory" id="invOpenBtn" onclick="toggleModal('inventoryModal', true)">
-      <span id="txtInventory">INVENTORY</span> (<span id="invCount">0</span>)
+      <span id="lblInventory">INVENTORY</span> (<span id="invCount">0</span>)
     </button>
     <a href="https://store.steampowered.com/tags/da/Inventarstyring/?l=russian&snr=1_5_9__409" target="_blank" class="btn-steam-link">
       Add from Steam
@@ -789,50 +766,40 @@
 
   <!-- Profile & Settings Modal -->
   <div class="modal-overlay" id="profileModal" onclick="toggleModal('profileModal', false)">
-    <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 85vh;">
+    <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 80vh;">
       <div class="sheet-header">
-        <div class="sheet-title" id="txtSettingsTitle">Settings & Profile</div>
+        <div class="sheet-title" id="lblProfileTitle">Profile & Settings</div>
         <button class="btn-close" onclick="toggleModal('profileModal', false)">&times;</button>
       </div>
 
-      <div class="profile-card">
-        <div class="profile-card-avatar" id="modalAvatar">V</div>
-        <div class="profile-card-title" id="modalUsername">Visa207</div>
+      <div class="profile-user-box">
+        <div id="modalAvatar" class="profile-avatar-large">V</div>
+        <div class="profile-name" id="profileName">Visa207</div>
       </div>
 
-      <div class="settings-group">
+      <div class="settings-list">
         <div class="setting-item">
-          <span class="setting-label" id="txtLangLabel">Language</span>
+          <div class="setting-title" id="lblLang">Language</div>
           <select class="setting-select" id="langSelect" onchange="changeLanguage(this.value)">
-            <option value="uk">Українська</option>
             <option value="en">English</option>
+            <option value="uk" selected>Українська</option>
           </select>
         </div>
 
         <div class="setting-item">
-          <span class="setting-label" id="txtCurrLabel">Currency</span>
+          <div class="setting-title" id="lblCurr">Currency</div>
           <select class="setting-select" id="currSelect" onchange="changeCurrency(this.value)">
-            <option value="USD">USD ($)</option>
-            <option value="UAH">UAH (₴)</option>
+            <option value="USD">$ USD</option>
+            <option value="UAH">₴ UAH</option>
           </select>
         </div>
-      </div>
 
-      <button class="privacy-btn" style="margin-top: 18px;" onclick="openPrivacyModal()" id="txtPrivacyBtn">
-        Privacy Policy
-      </button>
-    </div>
-  </div>
-
-  <!-- Privacy Policy Modal -->
-  <div class="modal-overlay" id="privacyModal" onclick="toggleModal('privacyModal', false)">
-    <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 70vh;">
-      <div class="sheet-header">
-        <div class="sheet-title" id="txtPrivacyTitle">Privacy Policy</div>
-        <button class="btn-close" onclick="toggleModal('privacyModal', false)">&times;</button>
-      </div>
-      <div class="privacy-text" id="txtPrivacyContent">
-        This app uses Telegram WebApp data to display your profile name and avatar. All game progression, inventory data, and balance are stored locally and in Telegram Cloud Storage. No personal information is shared with third parties.
+        <button class="privacy-link-btn" onclick="togglePrivacy()">
+          <span id="lblPrivacy">Privacy Policy</span> <span>▼</span>
+        </button>
+        <div class="privacy-content" id="privacyContent">
+          SITRO DROP does not collect personal identity data. All game assets and balances are saved locally via Telegram WebApp storage.
+        </div>
       </div>
     </div>
   </div>
@@ -841,7 +808,7 @@
   <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()">
       <div class="sheet-header">
-        <div class="sheet-title" id="txtMarketTitle">Storage & Market</div>
+        <div class="sheet-title">Storage & Market</div>
         <button class="btn-close" onclick="toggleModal('inventoryModal', false)">&times;</button>
       </div>
 
@@ -875,7 +842,7 @@
   <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 60vh;">
       <div class="sheet-header">
-        <div class="sheet-title" id="txtDepositTitle">Top Up Balance</div>
+        <div class="sheet-title" id="lblTopUp">Top Up Balance</div>
         <button class="btn-close" onclick="toggleModal('depositModal', false)">&times;</button>
       </div>
       <div class="deposit-options">
@@ -897,9 +864,9 @@
 
   <!-- TAPPER SCREEN -->
   <div class="clicker-modal" id="clickerModal">
-    <div class="clicker-header"><span class="curr-symb">$</span><span id="clickerBalance">0</span></div>
+    <div class="clicker-header"><span class="curr-sym">$</span><span id="clickerBalance">0</span></div>
     <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
-    <button class="btn-clicker-close" onclick="closeClicker()" id="txtClickerClose">BACK TO GAME</button>
+    <button class="btn-clicker-close" id="btnClickerClose" onclick="closeClicker()">BACK TO GAME</button>
   </div>
 
   <div class="result-toast" id="resultToast">RESULTS</div>
@@ -910,59 +877,6 @@
       tg.ready();
       tg.expand();
     }
-
-    const USD_TO_UAH = 41;
-    let currentCurrency = 'USD'; // 'USD' | 'UAH'
-    let currentLanguage = 'uk'; // 'uk' | 'en'
-
-    const TRANSLATIONS = {
-      uk: {
-        stakedSkin: 'Поставлений скін',
-        reroll: 'Змінити скіни рулетки',
-        spin: 'КРУТИТИ РУЛЕТКУ',
-        inventory: 'ІНВЕНТАР',
-        settingsTitle: 'Налаштування та Профіль',
-        langLabel: 'Мова',
-        currLabel: 'Валюта',
-        privacyBtn: 'Політика конфіденційності',
-        privacyTitle: 'Політика конфіденційності',
-        privacyContent: 'Цей додаток використовує дані Telegram WebApp для відображення вашого імені та аватарки. Усі ваші скіни, баланс та прогрес зберігаються локально і в Telegram Cloud Storage. Ваші дані не передаються третім особам.',
-        marketTitle: 'Сховище та Магазин',
-        tabSkins: 'Скіни',
-        tabShop: 'Магазин',
-        tabSale: 'Продаж',
-        depositTitle: 'Поповнити баланс',
-        backCategories: '← Назад до категорій',
-        clickerClose: 'НАЗАД ДО ГРИ',
-        emptyInv: 'Інвентар порожній',
-        noSale: 'Немає скінів для продажу',
-        buyBtn: 'Купити',
-        sellBtn: 'Продати'
-      },
-      en: {
-        stakedSkin: 'Staked Skin',
-        reroll: 'Change Wheel Skins',
-        spin: 'SPIN WHEEL',
-        inventory: 'INVENTORY',
-        settingsTitle: 'Settings & Profile',
-        langLabel: 'Language',
-        currLabel: 'Currency',
-        privacyBtn: 'Privacy Policy',
-        privacyTitle: 'Privacy Policy',
-        privacyContent: 'This app uses Telegram WebApp data to display your profile name and avatar. All game progression, inventory data, and balance are stored locally and in Telegram Cloud Storage. No personal information is shared with third parties.',
-        marketTitle: 'Storage & Market',
-        tabSkins: 'Skins',
-        tabShop: 'Shop',
-        tabSale: 'Sale',
-        depositTitle: 'Top Up Balance',
-        backCategories: '← Back to Categories',
-        clickerClose: 'BACK TO GAME',
-        emptyInv: 'Inventory is empty',
-        noSale: 'No skins to sell',
-        buyBtn: 'Buy',
-        sellBtn: 'Sell'
-      }
-    };
 
     const SKIN_POOL = [
       { id: 101, name: 'P250 | Sand Dune', price: 0.5, rarity: 'rarity-consumer', category: 'pistols' },
@@ -1020,8 +934,47 @@
     let currentRotation = 0;
     let activeShopCategory = null;
 
+    let currentLang = 'uk';
+    let currentCurrency = 'USD'; // 'USD' or 'UAH'
+    const UAH_RATE = 41;
+
     const canvas = document.getElementById('wheelCanvas');
     const ctx = canvas.getContext('2d');
+
+    const translations = {
+      uk: {
+        reroll: 'Змінити скіни рулетки',
+        staked: 'Поставлений скін',
+        spin: 'КРУТИТИ РУЛЕТКУ',
+        inventory: 'ІНВЕНТАР',
+        steam: 'Додати зі Steam',
+        profileTitle: 'Профіль та Налаштування',
+        lang: 'Мова',
+        curr: 'Валюта',
+        privacy: 'Політика конфіденційності',
+        topUp: 'Поповнити баланс',
+        back: '← Назад до категорій',
+        backGame: 'НАЗАД ДО ГРИ',
+        buy: 'Купити',
+        sell: 'Продати'
+      },
+      en: {
+        reroll: 'Change Wheel Skins',
+        staked: 'Staked Skin',
+        spin: 'SPIN WHEEL',
+        inventory: 'INVENTORY',
+        steam: 'Add from Steam',
+        profileTitle: 'Profile & Settings',
+        lang: 'Language',
+        curr: 'Currency',
+        privacy: 'Privacy Policy',
+        topUp: 'Top Up Balance',
+        back: '← Back to Categories',
+        backGame: 'BACK TO GAME',
+        buy: 'Buy',
+        sell: 'Sell'
+      }
+    };
 
     function init() {
       setupTelegramUser();
@@ -1037,79 +990,83 @@
 
     function setupTelegramUser() {
       const user = tg?.initDataUnsafe?.user;
-      const username = user?.username ? `@${user.username}` : (user?.first_name || 'Visa207');
-      const photo = user?.photo_url;
+      const profileNameEl = document.getElementById('profileName');
+      const headerAv = document.getElementById('headerAvatar');
+      const modalAv = document.getElementById('modalAvatar');
 
-      document.getElementById('headerUsername').innerText = username;
-      document.getElementById('modalUsername').innerText = username;
+      if (user) {
+        const displayName = user.username ? user.username : (user.first_name + (user.last_name ? ' ' + user.last_name : ''));
+        profileNameEl.innerText = displayName || 'Visa207';
 
-      if (photo) {
-        document.getElementById('headerAvatar').innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;">`;
-        document.getElementById('modalAvatar').innerHTML = `<img src="${photo}" style="width:100%;height:100%;border-radius:50%;">`;
+        if (user.photo_url) {
+          headerAv.innerHTML = `<img src="${user.photo_url}" style="width:100%;height:100%;border-radius:50%;">`;
+          modalAv.innerHTML = `<img src="${user.photo_url}" style="width:100%;height:100%;border-radius:50%;">`;
+        } else {
+          const letter = (displayName || 'V').charAt(0).toUpperCase();
+          headerAv.innerText = letter;
+          modalAv.innerText = letter;
+        }
       } else {
-        const firstLetter = username.replace('@','').charAt(0).toUpperCase() || 'V';
-        document.getElementById('headerAvatar').innerText = firstLetter;
-        document.getElementById('modalAvatar').innerText = firstLetter;
+        profileNameEl.innerText = 'Visa207';
+        headerAv.innerText = 'V';
+        modalAv.innerText = 'V';
       }
     }
 
-    function formatPrice(valInUSD) {
+    function formatPrice(usdPrice) {
       if (currentCurrency === 'UAH') {
-        return (valInUSD * USD_TO_UAH).toFixed(0);
+        return Math.round(usdPrice * UAH_RATE);
       }
-      return valInUSD.toFixed(2);
+      return usdPrice;
+    }
+
+    function getSymbol() {
+      return currentCurrency === 'UAH' ? '₴' : '$';
     }
 
     function updateLanguageUI() {
-      const t = TRANSLATIONS[currentLanguage];
-      document.getElementById('txtStakedSkin').innerText = t.stakedSkin;
+      const t = translations[currentLang];
       document.getElementById('rerollBtn').innerText = t.reroll;
+      document.getElementById('lblStakedSkin').innerText = t.staked;
       document.getElementById('spinBtn').innerText = t.spin;
-      document.getElementById('txtInventory').innerText = t.inventory;
-      document.getElementById('txtSettingsTitle').innerText = t.settingsTitle;
-      document.getElementById('txtLangLabel').innerText = t.langLabel;
-      document.getElementById('txtCurrLabel').innerText = t.currLabel;
-      document.getElementById('txtPrivacyBtn').innerText = t.privacyBtn;
-      document.getElementById('txtPrivacyTitle').innerText = t.privacyTitle;
-      document.getElementById('txtPrivacyContent').innerText = t.privacyContent;
-      document.getElementById('txtMarketTitle').innerText = t.marketTitle;
-      document.getElementById('tabBtnSkins').innerText = t.tabSkins;
-      document.getElementById('tabBtnShop').innerText = t.tabShop;
-      document.getElementById('tabBtnSale').innerText = t.tabSale;
-      document.getElementById('txtDepositTitle').innerText = t.depositTitle;
-      document.getElementById('backCategoriesBtn').innerText = t.backCategories;
-      document.getElementById('txtClickerClose').innerText = t.clickerClose;
+      document.getElementById('lblInventory').innerText = t.inventory;
+      document.getElementById('lblProfileTitle').innerText = t.profileTitle;
+      document.getElementById('lblLang').innerText = t.lang;
+      document.getElementById('lblCurr').innerText = t.curr;
+      document.getElementById('lblPrivacy').innerText = t.privacy;
+      document.getElementById('lblTopUp').innerText = t.topUp;
+      document.getElementById('backCategoriesBtn').innerText = t.back;
+      document.getElementById('btnClickerClose').innerText = t.backGame;
+
+      document.querySelectorAll('.curr-sym').forEach(el => el.innerText = getSymbol());
     }
 
     function changeLanguage(lang) {
-      currentLanguage = lang;
+      currentLang = lang;
       updateLanguageUI();
-      renderInventory();
-      renderShop();
-      renderSale();
-      saveDataToTelegram();
     }
 
     function changeCurrency(curr) {
       currentCurrency = curr;
-      const symbols = document.querySelectorAll('.curr-symb, #currSymbol');
-      symbols.forEach(s => s.innerText = curr === 'UAH' ? '₴' : '$');
-      
+      updateLanguageUI();
       updateBalanceUI();
       updateActiveSlotUI();
       renderInventory();
       renderShop();
       renderSale();
-      saveDataToTelegram();
+      generateWheelForSkin(selectedSkin);
+    }
+
+    function togglePrivacy() {
+      const content = document.getElementById('privacyContent');
+      content.style.display = content.style.display === 'block' ? 'none' : 'block';
     }
 
     function saveDataToTelegram() {
       if (!tg?.CloudStorage) return;
       const payload = {
         balance: userBalance,
-        inventory: userInventory,
-        language: currentLanguage,
-        currency: currentCurrency
+        inventory: userInventory
       };
       tg.CloudStorage.setItem('sitro_drop_save', JSON.stringify(payload));
     }
@@ -1122,18 +1079,9 @@
             const data = JSON.parse(value);
             if (data.balance !== undefined) userBalance = data.balance;
             if (data.inventory && Array.isArray(data.inventory)) userInventory = data.inventory;
-            if (data.language) {
-              currentLanguage = data.language;
-              document.getElementById('langSelect').value = data.language;
-            }
-            if (data.currency) {
-              currentCurrency = data.currency;
-              document.getElementById('currSelect').value = data.currency;
-            }
 
             selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
-            updateLanguageUI();
-            changeCurrency(currentCurrency);
+            updateBalanceUI();
             updateActiveSlotUI();
             renderInventory();
             renderSale();
@@ -1144,8 +1092,9 @@
     }
 
     function updateBalanceUI() {
-      document.getElementById('userBalance').innerText = formatPrice(userBalance);
-      document.getElementById('clickerBalance').innerText = formatPrice(userBalance);
+      const displayBal = formatPrice(userBalance);
+      document.getElementById('userBalance').innerText = displayBal;
+      document.getElementById('clickerBalance').innerText = displayBal;
       
       const clickerBtn = document.getElementById('clickForMoneyBtn');
       if (userBalance === 0) {
@@ -1181,11 +1130,6 @@
     function openCategoriesView() {
       activeShopCategory = null;
       renderShop();
-    }
-
-    function openPrivacyModal() {
-      toggleModal('profileModal', false);
-      toggleModal('privacyModal', true);
     }
 
     function getRandomSkinInPriceRange(minPrice, maxPrice, fallbackSkin) {
@@ -1372,14 +1316,11 @@
     function renderInventory() {
       const grid = document.getElementById('inventoryGrid');
       grid.innerHTML = '';
-      const t = TRANSLATIONS[currentLanguage];
 
       if (userInventory.length === 0) {
-        grid.innerHTML = `<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">${t.emptyInv}</div>`;
+        grid.innerHTML = '<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">Inventory is empty</div>';
         return;
       }
-
-      const sym = currentCurrency === 'UAH' ? '₴' : '$';
 
       userInventory.forEach((skin) => {
         const card = document.createElement('div');
@@ -1389,7 +1330,7 @@
         card.innerHTML = `
           <div class="rarity-bar ${skin.rarity}"></div>
           <div class="name">${skin.name}</div>
-          <div class="price">${sym}${formatPrice(skin.price)}</div>
+          <div class="price">${getSymbol()}${formatPrice(skin.price)}</div>
         `;
         grid.appendChild(card);
       });
@@ -1400,8 +1341,6 @@
     function renderShop() {
       const grid = document.getElementById('shopGrid');
       const backBtn = document.getElementById('backCategoriesBtn');
-      const t = TRANSLATIONS[currentLanguage];
-      const sym = currentCurrency === 'UAH' ? '₴' : '$';
       grid.innerHTML = '';
 
       if (activeShopCategory === null) {
@@ -1434,6 +1373,8 @@
           ? SKIN_POOL 
           : SKIN_POOL.filter(s => s.category === activeShopCategory);
 
+        const btnText = translations[currentLang].buy;
+
         filtered.forEach((skin) => {
           const card = document.createElement('div');
           card.className = 'item-card';
@@ -1441,8 +1382,8 @@
           card.innerHTML = `
             <div class="rarity-bar ${skin.rarity}"></div>
             <div class="name">${skin.name}</div>
-            <div class="price">${sym}${formatPrice(skin.price)}</div>
-            <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">${t.buyBtn}</button>
+            <div class="price">${getSymbol()}${formatPrice(skin.price)}</div>
+            <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">${btnText}</button>
           `;
           grid.appendChild(card);
         });
@@ -1471,14 +1412,14 @@
 
     function renderSale() {
       const grid = document.getElementById('saleGrid');
-      const t = TRANSLATIONS[currentLanguage];
-      const sym = currentCurrency === 'UAH' ? '₴' : '$';
       grid.innerHTML = '';
 
       if (userInventory.length === 0) {
-        grid.innerHTML = `<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">${t.noSale}</div>`;
+        grid.innerHTML = '<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">No skins to sell</div>';
         return;
       }
+
+      const btnText = translations[currentLang].sell;
 
       userInventory.forEach((skin) => {
         const card = document.createElement('div');
@@ -1487,8 +1428,8 @@
         card.innerHTML = `
           <div class="rarity-bar ${skin.rarity}"></div>
           <div class="name">${skin.name}</div>
-          <div class="price">${sym}${formatPrice(skin.price)}</div>
-          <button class="btn-action-card" onclick="sellSkin(event, ${skin.instanceId})">${t.sellBtn} (${sym}${formatPrice(skin.price)})</button>
+          <div class="price">${getSymbol()}${formatPrice(skin.price)}</div>
+          <button class="btn-action-card" onclick="sellSkin(event, ${skin.instanceId})">${btnText} (${getSymbol()}${formatPrice(skin.price)})</button>
         `;
         grid.appendChild(card);
       });
