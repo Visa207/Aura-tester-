@@ -319,7 +319,7 @@
       cursor: pointer;
     }
 
-    /* ФІКС ТУМБЛЕРІВ ТА ТАБІВ: плавнка прокрутка і фіксований розмір кнопок */
+    /* ФІКСОВАНИЙ РОЗМІР ТУМБЛЕРІВ ТА ВКТАДОК */
     .nav-tabs, .shop-category-tabs {
       display: flex;
       gap: 8px;
@@ -334,11 +334,11 @@
     }
 
     .nav-tabs::-webkit-scrollbar, .shop-category-tabs::-webkit-scrollbar {
-      display: none; /* ховаємо стандартну смугу скролу */
+      display: none;
     }
 
     .tab-btn, .shop-cat-btn {
-      flex-shrink: 0; /* ЗАБОРОНЯЄ КНОПКАМ ЗМЕНШУВАТИСЯ ТА СТИСКАЛИСЯ */
+      flex-shrink: 0; /* ГАРАНТІЯ ЩО ТУМБЛЕРИ НЕ ЗМЕНШАТЬСЯ */
       background: transparent;
       border: none;
       color: #888888;
@@ -689,6 +689,7 @@
       tg.expand();
     }
 
+    // ТІ САМІ ОРИГІНАЛЬНІ 39 СКІНІВ SITRO DROP
     const SKIN_POOL = [
       // CHEAP SKINS ($0.50 - $5.00)
       { id: 101, name: 'P250 | Sand Dune', price: 0.5, rarity: 'rarity-consumer', category: 'pistols' },
@@ -824,7 +825,9 @@
     function switchShopCategory(cat) {
       activeShopCategory = cat;
       document.querySelectorAll('.shop-cat-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (event && event.target) {
+        event.target.classList.add('active');
+      }
       renderShop();
     }
 
