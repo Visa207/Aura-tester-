@@ -319,8 +319,8 @@
       cursor: pointer;
     }
 
-    /* ФІКС ТУМБЛЕРІВ ТА ВКТАДОК */
-    .nav-tabs, .shop-category-tabs {
+    /* ОСНОВНІ ВАКЛАДКИ МОДАЛКИ (SKINS, SHOP, SALE) */
+    .nav-tabs {
       display: flex;
       gap: 8px;
       margin-bottom: 12px;
@@ -328,23 +328,14 @@
       padding: 6px;
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.08);
-      overflow-x: auto;
-      white-space: nowrap;
-      -webkit-overflow-scrolling: touch;
-      flex-shrink: 0; /* Контейнер не стискається */
     }
 
-    .nav-tabs::-webkit-scrollbar, .shop-category-tabs::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tab-btn, .shop-cat-btn {
-      flex-shrink: 0 !important; /* КНОПКИ ТУМБЛЕРІВ НІКОЛИ НЕ СТИСКАЮТЬСЯ */
-      min-width: max-content;
+    .tab-btn {
+      flex: 1;
       background: transparent;
       border: none;
       color: #888888;
-      padding: 10px 16px;
+      padding: 10px;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 800;
@@ -354,10 +345,49 @@
       transition: all 0.2s;
     }
 
-    .tab-btn.active, .shop-cat-btn.active {
+    .tab-btn.active {
       background: #ff7700;
       color: #ffffff;
       box-shadow: 0 0 10px rgba(255, 119, 0, 0.4);
+    }
+
+    /* 5 ВКТАДОК КАТЕГОРІЙ В SHOP (ФІКСОВАНІ, НЕ ЗМЕНШУЮТЬСЯ) */
+    .shop-category-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .shop-category-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .shop-cat-btn {
+      flex-shrink: 0; /* ЗАБОРОНЯЄ ЗМЕНШЕННЯ */
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #aaaaaa;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .shop-cat-btn.active {
+      background: rgba(255, 119, 0, 0.2);
+      border-color: #ff7700;
+      color: #ff8800;
+      box-shadow: 0 0 8px rgba(255, 119, 0, 0.3);
     }
 
     .tab-content {
@@ -502,7 +532,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* TAPPER SCREEN */
+    /* CLICKER SCREEN */
     .clicker-modal {
       position: fixed;
       top: 0;
@@ -613,6 +643,7 @@
     </a>
   </div>
 
+  <!-- Inventory & Shop Sheet Modal -->
   <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()">
       <div class="sheet-header">
@@ -626,27 +657,31 @@
         <button class="tab-btn" onclick="switchTab('sale')">Sale</button>
       </div>
 
+      <!-- SKINS TAB -->
       <div class="tab-content active" id="tab-skins">
         <div class="inventory-grid" id="inventoryGrid"></div>
       </div>
 
+      <!-- SHOP TAB (З 5 ВКЛАДКАМИ КАТЕГОРІЙ) -->
       <div class="tab-content" id="tab-shop">
         <div class="shop-category-tabs">
-          <button class="shop-cat-btn active" onclick="switchShopCategory('all', event)">All</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('rifles', event)">Rifles</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('pistols', event)">Pistols</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('knives', event)">Knives</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('smg', event)">Heavy/SMG</button>
+          <button class="shop-cat-btn active" onclick="switchShopCategory(event, 'all')">All</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'pistols')">Pistols</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'rifles')">Rifles</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'knives')">Knives</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory(event, 'smg')">Heavy/SMG</button>
         </div>
         <div class="inventory-grid" id="shopGrid"></div>
       </div>
 
+      <!-- SALE TAB -->
       <div class="tab-content" id="tab-sale">
         <div class="inventory-grid" id="saleGrid"></div>
       </div>
     </div>
   </div>
 
+  <!-- Deposit Modal -->
   <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 60vh;">
       <div class="sheet-header">
@@ -670,6 +705,7 @@
     </div>
   </div>
 
+  <!-- CLICKER SCREEN -->
   <div class="clicker-modal" id="clickerModal">
     <div class="clicker-header">$<span id="clickerBalance">0</span></div>
     <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
@@ -817,11 +853,11 @@
       }
     }
 
-    function switchShopCategory(cat, evt) {
+    function switchShopCategory(e, cat) {
       activeShopCategory = cat;
       document.querySelectorAll('.shop-cat-btn').forEach(btn => btn.classList.remove('active'));
-      if (evt && evt.target) {
-        evt.target.classList.add('active');
+      if (e && e.target) {
+        e.target.classList.add('active');
       }
       renderShop();
     }
