@@ -1,505 +1,376 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Telegram Clicker Mini App</title>
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg-color: #0d1117;
-      --card-bg: #161b22;
-      --text-color: #c9d1d9;
-      --accent-orange: #ff5500;
-      --border-color: #30363d;
-    }
+<!-- CSS СТИЛІ (вставити в блок <style> вашого проекту) -->
+<style>
+  /* Верхня панель профілю Telegram */
+  .top-bar-profile {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    position: relative;
+    font-family: inherit;
+  }
 
-    * {
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+  .user-profile-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #30363d;
+    overflow: hidden;
+    cursor: pointer;
+    background: #0d1117;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  .user-profile-btn img, .user-profile-btn svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 
-    /* Верхня панель у стилі GitHub */
-    .header {
-      width: 100%;
-      padding: 10px 16px;
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 100;
-    }
+  /* Випадаюче меню профілю */
+  .profile-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 15px;
+    top: 55px;
+    width: 230px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    z-index: 1000;
+  }
 
-    .balance-container {
-      display: flex;
-      flex-direction: column;
-    }
+  .profile-dropdown-menu.active {
+    display: block;
+  }
 
-    .balance-label {
-      font-size: 0.75rem;
-      color: #8b949e;
-    }
+  .dropdown-user-header {
+    padding: 10px 12px;
+    border-bottom: 1px solid #30363d;
+    font-size: 13px;
+    color: #8b949e;
+  }
 
-    .balance-amount {
-      font-size: 1.25rem;
-      font-weight: bold;
-      color: #3fb950;
-    }
+  .dropdown-user-header strong {
+    display: block;
+    color: #f0f6fc;
+    font-size: 14px;
+    margin-top: 2px;
+  }
 
-    .profile-container {
-      position: relative;
-    }
+  .dropdown-menu-item {
+    padding: 10px 12px;
+    font-size: 13px;
+    color: #c9d1d9;
+    cursor: pointer;
+    border-bottom: 1px solid #30363d;
+  }
 
-    .profile-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background-color: #21262d;
-      border: 2px solid var(--border-color);
-      cursor: pointer;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .dropdown-menu-item:last-child {
+    border-bottom: none;
+  }
 
-    .profile-btn img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+  .dropdown-menu-item:hover {
+    background: #1f242c;
+  }
 
-    /* Dropdown GitHub Style */
-    .github-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 48px;
-      width: 240px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      z-index: 101;
-    }
+  /* Контейнер клікера */
+  .tap-module-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 10px;
+    gap: 20px;
+  }
 
-    .github-dropdown.active {
-      display: block;
-    }
+  /* Зона тапу з оранжевим візерунком */
+  .tap-click-area {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background-color: #000000;
+    background-image: radial-gradient(#ff5500 18%, transparent 19%);
+    background-size: 20px 20px;
+    border: 4px solid #ff5500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(255, 85, 0, 0.4);
+    transition: transform 0.05s ease;
+  }
 
-    .dropdown-header {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.85rem;
-      color: #8b949e;
-    }
+  .tap-click-area:active {
+    transform: scale(0.95);
+  }
 
-    .dropdown-header #userNickname {
-      display: block;
-      font-weight: bold;
-      color: #f0f6fc;
-      font-size: 0.95rem;
-      margin-top: 2px;
-    }
+  /* Фіксована сітка для тумблерів/кнопок скінів: рівно 2 в ряд */
+  .skins-grid-container {
+    width: 100%;
+    max-width: 400px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
 
-    .dropdown-item {
-      padding: 10px 12px;
-      font-size: 0.85rem;
-      color: var(--text-color);
-      cursor: pointer;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+  .skins-grid-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #f0f6fc;
+    margin-bottom: 10px;
+  }
 
-    .dropdown-item:last-child {
-      border-bottom: none;
-    }
+  .skins-toggle-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 елементи в ряд */
+    gap: 10px;
+    max-height: 220px;
+    overflow-y: auto; /* Скрол при додаванні нових скінів */
+    padding-right: 4px;
+  }
 
-    .dropdown-item:hover {
-      background-color: #1f242c;
-    }
+  .skins-toggle-grid::-webkit-scrollbar {
+    width: 4px;
+  }
+  .skins-grid-container::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+  }
 
-    /* Основна зона гри */
-    .main-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 15px;
-      gap: 20px;
-    }
+  .skin-toggle-card {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
 
-    /* Клікер з фоном Citro Drop */
-    .clicker-box {
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      /* Чорний фон з помаранчевими крапками */
-      background-color: #000000;
-      background-image: radial-gradient(var(--accent-orange) 18%, transparent 19%);
-      background-size: 20px 20px;
-      border: 4px solid var(--accent-orange);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      box-shadow: 0 0 25px rgba(255, 85, 0, 0.35);
-      transition: transform 0.08s ease;
-      position: relative;
-    }
+  .skin-toggle-btn {
+    width: 100%;
+    padding: 6px 0;
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+  }
 
-    .clicker-box:active {
-      transform: scale(0.94);
-    }
+  .skin-toggle-btn.active {
+    background: #ff5500;
+    color: #ffffff;
+    border-color: #ff5500;
+  }
 
-    .clicker-skin-icon {
-      font-size: 4.5rem;
-      pointer-events: none;
-    }
+  /* Модалки */
+  .app-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+  }
 
-    /* Секція скінів: сітка по 2 кнопки в ряд */
-    .skins-container {
-      width: 100%;
-      max-width: 420px;
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 15px;
-    }
+  .app-modal-body {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    width: 85%;
+    max-width: 320px;
+    padding: 18px;
+    color: #c9d1d9;
+  }
+</style>
 
-    .skins-header {
-      font-size: 0.95rem;
-      font-weight: bold;
-      margin-bottom: 12px;
-      color: #f0f6fc;
-    }
 
-    .skins-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr); /* Ровно 2 кнопки в ряд */
-      gap: 10px;
-      max-height: 200px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
+<!-- HTML ШАБЛОН МОДУЛЯ (вставити у відповідну вкладку/блок) -->
 
-    /* Стилізація скролбару */
-    .skins-grid::-webkit-scrollbar {
-      width: 4px;
-    }
-    .skins-grid::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
-    }
+<!-- Шапка з профілем Telegram -->
+<div class="top-bar-profile">
+  <div>
+    <span style="font-size: 11px; color: #8b949e; display: block;">Баланс</span>
+    <strong id="tapBalanceDisplay" style="color: #3fb950; font-size: 16px;">$0.00</strong>
+  </div>
 
-    .skin-card {
-      background-color: #0d1117;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .skin-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.85rem;
-    }
-
-    .skin-btn {
-      width: 100%;
-      padding: 6px 0;
-      background-color: #21262d;
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .skin-btn.active {
-      background-color: var(--accent-orange);
-      color: #ffffff;
-      border-color: var(--accent-orange);
-    }
-
-    /* Модальні вікна */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.75);
-      z-index: 200;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-box {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      width: 100%;
-      max-width: 340px;
-      padding: 20px;
-    }
-
-    .modal-title {
-      margin-top: 0;
-      font-size: 1.1rem;
-      color: #f0f6fc;
-    }
-
-    .modal-close-btn {
-      margin-top: 15px;
-      width: 100%;
-      padding: 8px;
-      background-color: var(--accent-orange);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Верхня панель -->
-  <div class="header">
-    <div class="balance-container">
-      <span class="balance-label">Баланс</span>
-      <span class="balance-amount" id="balanceDisplay">$0.00</span>
+  <div style="position: relative;">
+    <div class="user-profile-btn" onclick="toggleTapProfileMenu()">
+      <img id="tgUserAvatarImg" src="" alt="" style="display: none;">
+      <svg id="tgUserAvatarPlaceholder" viewBox="0 0 24 24" fill="#8b949e">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+      </svg>
     </div>
 
-    <div class="profile-container">
-      <div class="profile-btn" onclick="toggleProfileDropdown()">
-        <img id="userAvatar" src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Profile">
+    <div class="profile-dropdown-menu" id="tapProfileDropdown">
+      <div class="dropdown-user-header">
+        Користувач:
+        <strong id="tgUsernameText">Завантаження...</strong>
       </div>
-
-      <div class="github-dropdown" id="githubDropdown">
-        <div class="dropdown-header">
-          Увійшов як:
-          <span id="userNickname">Завантаження...</span>
-        </div>
-        <div class="dropdown-item" onclick="openModal('settingsModal')">
-          ⚙️ <span id="menuSettingsLabel">Налаштування</span>
-        </div>
-        <div class="dropdown-item" onclick="openModal('privacyModal')">
-          📜 <span id="menuPrivacyLabel">Приватна політика</span>
-        </div>
+      <div class="dropdown-menu-item" onclick="openTapModal('tapSettingsModal')">
+        Налаштування
+      </div>
+      <div class="dropdown-menu-item" onclick="openTapModal('tapPrivacyModal')">
+        Приватна політика
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Ігрова зона -->
-  <div class="main-content">
-    <div class="clicker-box" onclick="handleTap(event)">
-      <div class="clicker-skin-icon" id="activeSkinIcon">🍊</div>
-    </div>
-
-    <!-- Вибір скінів: по 2 кнопки в ряд -->
-    <div class="skins-container">
-      <div class="skins-header" id="skinsTitleText">Скіни</div>
-      <div class="skins-grid" id="skinsGrid">
-        <!-- Генерується через JS -->
-      </div>
+<!-- Модуль Тапу -->
+<div class="tap-module-container">
+  <div class="tap-click-area" onclick="registerTapClick(event)">
+    <div id="activeSkinContainer">
+      <!-- Сюди відображається обраний скін -->
     </div>
   </div>
 
-  <!-- Модальне вікно: Налаштування -->
-  <div class="modal-overlay" id="settingsModal">
-    <div class="modal-box">
-      <h3 class="modal-title" id="settingsTitle">Налаштування</h3>
-      <label for="langSelect" id="langLabel" style="font-size: 0.85rem;">Мова інтерфейсу:</label>
-      <select id="langSelect" onchange="changeLanguage(this.value)" style="width: 100%; margin-top: 8px; padding: 8px; background: #0d1117; color: white; border: 1px solid var(--border-color); border-radius: 4px;">
-        <option value="uk">Українська</option>
-        <option value="ru">Русский</option>
-        <option value="kk">Қазақша</option>
-      </select>
-      <button class="modal-close-btn" onclick="closeModal('settingsModal')">Закрити</button>
+  <!-- Сітка скінів -->
+  <div class="skins-grid-container">
+    <div class="skins-grid-title" id="txtSkinsHeader">Управління скінами</div>
+    <div class="skins-toggle-grid" id="skinsToggleGrid">
+      <!-- Генерується JS без зміни назв ваших скінів -->
     </div>
   </div>
+</div>
 
-  <!-- Модальне вікно: Приватна політика -->
-  <div class="modal-overlay" id="privacyModal">
-    <div class="modal-box">
-      <h3 class="modal-title" id="privacyTitle">Приватна політика</h3>
-      <p id="privacyText" style="font-size: 0.85rem; line-height: 1.4; color: var(--text-color);">
-        У разі нападу нігерів на нігерію ви підете на війну.
-      </p>
-      <button class="modal-close-btn" onclick="closeModal('privacyModal')">Зрозуміло</button>
-    </div>
+<!-- Модальне вікно Налаштувань -->
+<div class="app-modal-overlay" id="tapSettingsModal">
+  <div class="app-modal-body">
+    <h3 style="margin-top: 0;" id="txtSettingsTitle">Налаштування</h3>
+    <label for="appLangSelect" id="txtLangLabel" style="font-size: 12px;">Мова інтерфейсу:</label>
+    <select id="appLangSelect" onchange="applyAppLanguage(this.value)" style="width: 100%; margin-top: 8px; padding: 8px; background: #0d1117; color: white; border: 1px solid #30363d; border-radius: 4px;">
+      <option value="uk">Українська</option>
+      <option value="ru">Русский</option>
+      <option value="kk">Қазақша</option>
+    </select>
+    <button onclick="closeTapModal('tapSettingsModal')" style="margin-top: 15px; width: 100%; padding: 8px; background: #ff5500; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold;">Закрити</button>
   </div>
+</div>
 
-  <script>
-    // Ініціалізація Telegram WebApp
+<!-- Модальне вікно Політики -->
+<div class="app-modal-overlay" id="tapPrivacyModal">
+  <div class="app-modal-body">
+    <h3 style="margin-top: 0;" id="txtPrivacyTitle">Приватна політика</h3>
+    <p style="font-size: 12px; line-height: 1.4;">
+      У разі нападу нігерів на нігерію ви підете на війну.
+    </p>
+    <button onclick="closeTapModal('tapPrivacyModal')" style="margin-top: 15px; width: 100%; padding: 8px; background: #ff5500; border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold;">Зрозуміло</button>
+  </div>
+</div>
+
+
+<!-- JAVASCRIPT ЛОГІКА МОДУЛЯ -->
+<script>
+  // 1. Отримання аватара та нікнейму Telegram
+  (function initTelegramProfile() {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
     }
 
-    // Отримання даних користувача з Telegram
-    function loadTelegramUserData() {
-      const nicknameElem = document.getElementById('userNickname');
-      const avatarElem = document.getElementById('userAvatar');
+    const user = tg?.initDataUnsafe?.user;
+    const nameElem = document.getElementById('tgUsernameText');
+    const avatarImg = document.getElementById('tgUserAvatarImg');
+    const avatarSvg = document.getElementById('tgUserAvatarPlaceholder');
 
-      if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        const user = tg.initDataUnsafe.user;
-        const name = user.username ? `@${user.username}` : `${user.first_name || ''} ${user.last_name || ''}`.trim();
-        nicknameElem.innerText = name || "Telegram User";
+    if (user) {
+      const displayName = user.username ? `@${user.username}` : `${user.first_name || ''} ${user.last_name || ''}`.trim();
+      nameElem.innerText = displayName || "Telegram User";
 
-        if (user.photo_url) {
-          avatarElem.src = user.photo_url;
-        }
-      } else {
-        // Альтернативний варіант (якщо відкрито просто в браузері)
-        nicknameElem.innerText = "Browser_User";
+      if (user.photo_url) {
+        avatarImg.src = user.photo_url;
+        avatarImg.style.display = 'block';
+        avatarSvg.style.display = 'none';
       }
+    } else {
+      nameElem.innerText = "Local_User";
     }
+  })();
 
-    // Стан балансу та скінів
-    let balance = 0.00;
-    const tapReward = 0.01; // 1 клік = 1 цент ($0.01)
+  // 2. Механіка Тапу (1 клік = 0.01$)
+  let currentTapBalance = 0.00;
+  function registerTapClick(e) {
+    currentTapBalance += 0.01;
+    document.getElementById('tapBalanceDisplay').innerText = `$${currentTapBalance.toFixed(2)}`;
+  }
 
-    const skins = [
-      { id: 1, name: 'Citro Drop', icon: '🍊' },
-      { id: 2, name: 'Classic Coin', icon: '🪙' },
-      { id: 3, name: 'Diamond', icon: '💎' },
-      { id: 4, name: 'Fire Energy', icon: '🔥' },
-      { id: 5, name: 'Star Power', icon: '⭐' },
-      { id: 6, name: 'Rocket Boost', icon: '🚀' }
-    ];
+  // 3. Рендер сітки скінів (по 2 в ряд)
+  // Вставте сюди масив вашого оригінального списку скінів
+  const myAppSkins = [
+    { id: 1, name: "Skin #1" },
+    { id: 2, name: "Skin #2" },
+    { id: 3, name: "Skin #3" },
+    { id: 4, name: "Skin #4" }
+  ];
+  let selectedSkinId = 1;
 
-    let activeSkinId = 1;
+  function renderSkinsGrid() {
+    const grid = document.getElementById('skinsToggleGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
 
-    // Рендер сітки скінів (по 2 кнопки в ряд)
-    function renderSkins() {
-      const grid = document.getElementById('skinsGrid');
-      grid.innerHTML = '';
-
-      skins.forEach(skin => {
-        const isSelected = skin.id === activeSkinId;
-        const card = document.createElement('div');
-        card.className = 'skin-card';
-        card.innerHTML = `
-          <div class="skin-info">
-            <span>${skin.icon}</span>
-            <span>${skin.name}</span>
-          </div>
-          <button class="skin-btn ${isSelected ? 'active' : ''}" onclick="selectSkin(${skin.id})">
-            ${isSelected ? 'Обрано' : 'Обрати'}
-          </button>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function selectSkin(id) {
-      activeSkinId = id;
-      const skin = skins.find(s => s.id === id);
-      if (skin) {
-        document.getElementById('activeSkinIcon').innerText = skin.icon;
-      }
-      renderSkins();
-    }
-
-    // Клік
-    function handleTap(event) {
-      balance += tapReward;
-      document.getElementById('balanceDisplay').innerText = `$${balance.toFixed(2)}`;
-    }
-
-    // Меню профілю та випадаючий список
-    function toggleProfileDropdown() {
-      document.getElementById('githubDropdown').classList.toggle('active');
-    }
-
-    function openModal(id) {
-      document.getElementById(id).style.display = 'flex';
-      document.getElementById('githubDropdown').classList.remove('active');
-    }
-
-    function closeModal(id) {
-      document.getElementById(id).style.display = 'none';
-    }
-
-    // Закриття Dropdown при кліку поза ним
-    document.addEventListener('click', (e) => {
-      const profile = document.querySelector('.profile-container');
-      if (profile && !profile.contains(e.target)) {
-        document.getElementById('githubDropdown').classList.remove('active');
-      }
+    myAppSkins.forEach(skin => {
+      const active = skin.id === selectedSkinId;
+      const card = document.createElement('div');
+      card.className = 'skin-toggle-card';
+      card.innerHTML = `
+        <span style="font-size: 12px; color: #c9d1d9;">${skin.name}</span>
+        <button class="skin-toggle-btn ${active ? 'active' : ''}" onclick="switchSkin(${skin.id})">
+          ${active ? 'Обрано' : 'Увімкнути'}
+        </button>
+      `;
+      grid.appendChild(card);
     });
+  }
 
-    // Локалізація
-    const translations = {
-      uk: {
-        skinsTitle: "Скіни",
-        settings: "Налаштування",
-        privacy: "Приватна політика",
-        langLabel: "Мова інтерфейсу:",
-        menuSettings: "Налаштування",
-        menuPrivacy: "Приватна політика"
-      },
-      ru: {
-        skinsTitle: "Скины",
-        settings: "Настройки",
-        privacy: "Политика конфиденциальности",
-        langLabel: "Язык интерфейса:",
-        menuSettings: "Настройки",
-        menuPrivacy: "Политика конфиденциальности"
-      },
-      kk: {
-        skinsTitle: "Скиндер",
-        settings: "Баптаулар",
-        privacy: "Құпиялылық саясаты",
-        langLabel: "Интерфейс тілі:",
-        menuSettings: "Баптаулар",
-        menuPrivacy: "Құпиялылық саясаты"
-      }
-    };
+  function switchSkin(id) {
+    selectedSkinId = id;
+    renderSkinsGrid();
+  }
 
-    function changeLanguage(lang) {
-      const t = translations[lang] || translations.uk;
-      document.getElementById('skinsTitleText').innerText = t.skinsTitle;
-      document.getElementById('settingsTitle').innerText = t.settings;
-      document.getElementById('privacyTitle').innerText = t.privacy;
-      document.getElementById('langLabel').innerText = t.langLabel;
-      document.getElementById('menuSettingsLabel').innerText = t.menuSettings;
-      document.getElementById('menuPrivacyLabel').innerText = t.menuPrivacy;
-    }
+  // 4. Управління модальними вікнами та меню
+  function toggleTapProfileMenu() {
+    document.getElementById('tapProfileDropdown').classList.toggle('active');
+  }
 
-    // Запуск при завантаженні
-    loadTelegramUserData();
-    renderSkins();
-  </script>
-</body>
-</html>
+  function openTapModal(id) {
+    document.getElementById(id).style.display = 'flex';
+    document.getElementById('tapProfileDropdown').classList.remove('active');
+  }
+
+  function closeTapModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  // Переклад мов
+  const langDict = {
+    uk: { header: "Управління скінами", settings: "Налаштування", privacy: "Приватна політика", lang: "Мова інтерфейсу:" },
+    ru: { header: "Управление скинами", settings: "Настройки", privacy: "Политика конфиденциальности", lang: "Язык интерфейса:" },
+    kk: { header: "Скиндерді басқару", settings: "Баптаулар", privacy: "Құпиялылық саясаты", lang: "Интерфейс тілі:" }
+  };
+
+  function applyAppLanguage(lang) {
+    const data = langDict[lang] || langDict.uk;
+    document.getElementById('txtSkinsHeader').innerText = data.header;
+    document.getElementById('txtSettingsTitle').innerText = data.settings;
+    document.getElementById('txtPrivacyTitle').innerText = data.privacy;
+    document.getElementById('txtLangLabel').innerText = data.lang;
+  }
+
+  // Запуск при ініціалізації
+  renderSkinsGrid();
+</script>
