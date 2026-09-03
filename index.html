@@ -1,1162 +1,477 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SITRO DROP - CS2 Wheel Upgrader</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Mini App Clicker</title>
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
       user-select: none;
-      -webkit-user-select: none;
     }
 
     body {
-      background-color: #0b0b0d;
-      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0d1117;
+      color: #c9d1d9;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      padding-bottom: 90px;
-    }
-
-    .glow-bg {
-      position: fixed;
-      top: 25%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 350px;
-      height: 350px;
-      background: radial-gradient(circle, rgba(255, 115, 0, 0.25) 0%, rgba(0,0,0,0) 70%);
-      z-index: 0;
-      pointer-events: none;
-      filter: blur(25px);
-    }
-
-    header {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      padding: 15px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .balance-badge {
-      background: rgba(18, 18, 22, 0.9);
-      border: 1px solid rgba(255, 119, 0, 0.5);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 800;
-      color: #ff8800;
-      cursor: pointer;
-      box-shadow: 0 0 10px rgba(255, 119, 0, 0.2);
-    }
-
-    .logo {
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 3px;
-      color: #ffffff;
-      text-shadow: 0 0 12px rgba(255, 120, 0, 0.6);
-      text-transform: uppercase;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .logo span {
-      color: #ff7700;
-    }
-
-    .app-container {
-      position: relative;
-      z-index: 5;
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-grow: 1;
-      justify-content: center;
-      padding: 0 15px;
-    }
-
-    .wheel-wrapper {
-      position: relative;
-      width: 290px;
-      height: 290px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .wheel-pointer {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-top: 24px solid #ff7700;
-      z-index: 20;
-      filter: drop-shadow(0 0 8px rgba(255, 119, 0, 0.9));
-    }
-
-    canvas#wheelCanvas {
-      width: 280px;
-      height: 280px;
-      border-radius: 50%;
-      box-shadow: 0 0 25px rgba(255, 110, 0, 0.3), inset 0 0 15px rgba(0,0,0,0.8);
-      border: 3px solid rgba(255, 120, 0, 0.5);
-    }
-
-    .btn-reroll {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 119, 0, 0.4);
-      color: #ffaa33;
-      padding: 8px 16px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-bottom: 15px;
-      transition: all 0.2s;
-    }
-
-    .btn-reroll:active {
-      transform: scale(0.95);
-      background: rgba(255, 119, 0, 0.2);
-    }
-
-    .selected-slot-card {
-      width: 100%;
-      max-width: 320px;
-      background: rgba(18, 18, 22, 0.9);
-      border: 1px solid rgba(255, 119, 0, 0.4);
-      border-radius: 14px;
-      padding: 12px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .slot-details .title {
-      font-size: 11px;
-      color: #888888;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-
-    .slot-details .name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      margin-top: 2px;
-    }
-
-    .slot-price {
-      font-size: 18px;
-      font-weight: 800;
-      color: #ff8800;
-    }
-
-    .btn-spin {
-      width: 100%;
-      max-width: 320px;
-      padding: 14px;
-      background: linear-gradient(135deg, #ff8800 0%, #e64a00 100%);
-      border: none;
-      border-radius: 12px;
-      color: #ffffff;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 6px 20px rgba(230, 74, 0, 0.45);
-      transition: all 0.2s ease;
-    }
-
-    .btn-spin:active {
-      transform: scale(0.97);
-    }
-
-    .btn-spin:disabled {
-      background: #2a2a30;
-      color: #666666;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-
-    .bottom-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(14, 14, 18, 0.95);
-      border-top: 1px solid rgba(255, 120, 0, 0.3);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 90;
-      backdrop-filter: blur(10px);
-    }
-
-    .btn-inventory {
-      background: linear-gradient(135deg, #252530 0%, #1a1a22 100%);
-      border: 1px solid rgba(255, 120, 0, 0.5);
-      color: #ffffff;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: 800;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(255, 120, 0, 0.2);
-    }
-
-    .btn-inventory:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-steam-link {
-      background: linear-gradient(135deg, #171a21 0%, #2a475e 100%);
-      border: 1px solid #66c0f4;
-      color: #ffffff;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 700;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 0 10px rgba(102, 192, 244, 0.2);
-    }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      backdrop-filter: blur(6px);
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .inventory-sheet {
-      position: fixed;
-      bottom: -100%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 440px;
-      height: 80vh;
-      background: #121216;
-      border-top-left-radius: 22px;
-      border-top-right-radius: 22px;
-      border-top: 2px solid #ff7700;
-      z-index: 101;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      transition: bottom 0.35s ease;
-    }
-
-    .modal-overlay.active .inventory-sheet {
-      bottom: 0;
-    }
-
-    .sheet-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .sheet-title {
-      font-size: 18px;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      color: #888888;
-      font-size: 26px;
-      cursor: pointer;
-    }
-
-    .nav-tabs, .shop-category-tabs {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-      background: rgba(0, 0, 0, 0.4);
-      padding: 4px;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      overflow-x: auto;
-    }
-
-    .tab-btn, .shop-cat-btn {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #888888;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      text-transform: uppercase;
-      text-align: center;
-      white-space: nowrap;
-      transition: 0.2s;
-    }
-
-    .tab-btn.active, .shop-cat-btn.active {
-      background: #ff7700;
-      color: #ffffff;
-      box-shadow: 0 0 10px rgba(255, 119, 0, 0.4);
-    }
-
-    .tab-content {
-      display: none;
-      width: 100%;
-      flex-direction: column;
-      flex-grow: 1;
+      height: 100vh;
       overflow: hidden;
     }
 
-    .tab-content.active {
+    /* Верхня панель (GitHub Style Header) */
+    .header {
       display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background-color: #161b22;
+      border-bottom: 1px solid #30363d;
+      position: relative;
+      z-index: 10;
     }
 
-    .inventory-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      overflow-y: auto;
-      flex-grow: 1;
-      padding-bottom: 10px;
+    .balance-display {
+      font-size: 18px;
+      font-weight: bold;
+      color: #3fb950;
     }
 
-    .item-card {
-      background: rgba(22, 22, 28, 0.9);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 16px 12px;
+    .profile-container {
+      position: relative;
+    }
+
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #30363d;
+      cursor: pointer;
+      background-color: #21262d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #58a6ff;
+    }
+
+    /* Випадаюче меню GitHub */
+    .github-dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      width: 220px;
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      z-index: 100;
+      padding: 8px 0;
+    }
+
+    .github-dropdown.active {
+      display: block;
+    }
+
+    .dropdown-header {
+      padding: 8px 16px;
+      border-bottom: 1px solid #30363d;
+      font-size: 13px;
+      color: #8b949e;
+    }
+
+    .dropdown-header span {
+      display: block;
+      font-weight: bold;
+      color: #c9d1d9;
+      font-size: 14px;
+    }
+
+    .dropdown-item {
+      padding: 8px 16px;
+      font-size: 14px;
+      color: #c9d1d9;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-item:hover {
+      background-color: #1f6feb;
+      color: #ffffff;
+    }
+
+    .dropdown-divider {
+      height: 1px;
+      background-color: #30363d;
+      margin: 4px 0;
+    }
+
+    /* Зона клікера з помаранчевим фоном у цятку (Nitro Drop style) */
+    .clicker-area {
+      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       position: relative;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .item-card.selected {
-      border-color: #ff7700;
-      box-shadow: 0 0 12px rgba(255, 119, 0, 0.4);
-    }
-
-    .item-card .rarity-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-    }
-
-    .item-card .name {
-      font-size: 12px;
-      font-weight: 700;
-      text-align: center;
-      color: #ffffff;
-      margin-bottom: 6px;
-    }
-
-    .item-card .price {
-      font-size: 14px;
-      font-weight: 800;
-      color: #ff8800;
-      margin-bottom: 8px;
-    }
-
-    .btn-action-card {
-      background: linear-gradient(135deg, #ff8800 0%, #e64a00 100%);
-      border: none;
-      color: #ffffff;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    .deposit-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .deposit-btn {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 119, 0, 0.4);
-      color: #ffffff;
-      padding: 14px;
-      border-radius: 12px;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      text-decoration: none;
-      transition: 0.2s;
-    }
-
-    .deposit-btn:hover {
-      background: rgba(255, 119, 0, 0.2);
-    }
-
-    .card-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #18181c;
-      border: 1px solid #ff7700;
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 14px;
-      box-shadow: 0 0 6px rgba(255, 119, 0, 0.3);
-    }
-
-    .result-toast {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-50px);
-      background: #1a1a22;
-      border: 2px solid #ff7700;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-weight: 800;
-      font-size: 14px;
-      color: #ffffff;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-      z-index: 200;
-      opacity: 0;
-      transition: all 0.4s ease;
-      pointer-events: none;
-      text-align: center;
-    }
-
-    .result-toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    /* TAPPER SCREEN WITH POLKA DOTS */
-    .clicker-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #121216;
-      background-image: radial-gradient(#ffd700 15%, transparent 16%), radial-gradient(#ff7700 15%, transparent 16%);
-      background-size: 30px 30px;
+      background-color: #000000;
+      /* Генерація симетричного візерунку у помаранчеву цятку */
+      background-image: radial-gradient(#ff4500 20%, transparent 20%), radial-gradient(#ff4500 20%, transparent 20%);
       background-position: 0 0, 15px 15px;
-      z-index: 300;
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 40px 20px;
+      background-size: 30px 30px;
     }
 
-    .clicker-modal.active {
-      display: flex;
-    }
-
-    .clicker-header {
-      font-size: 28px;
-      font-weight: 900;
-      color: #ffffff;
-      text-shadow: 0 0 10px #000;
-      background: rgba(0,0,0,0.7);
-      padding: 10px 20px;
-      border-radius: 16px;
-      border: 2px solid #ffd700;
-    }
-
-    .clicker-coin {
+    .click-target {
       width: 180px;
       height: 180px;
       border-radius: 50%;
-      background: radial-gradient(circle, #ffe600 0%, #ff8800 100%);
-      border: 6px solid #ffffff;
-      box-shadow: 0 0 35px #ff8800;
+      background: linear-gradient(145deg, #ff5722, #e64a19);
+      border: 4px solid #ffffff;
+      box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 60px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #fff;
       cursor: pointer;
       transition: transform 0.05s ease;
+      touch-action: manipulation;
+    }
+
+    .click-target:active {
+      transform: scale(0.93);
+    }
+
+    /* Анімація вилітаючих цифр */
+    .floating-text {
+      position: absolute;
+      color: #2ecc71;
+      font-weight: bold;
+      font-size: 20px;
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-50px);
+      }
+    }
+
+    /* Список скінів / Магазин (З виправленням стискання тумблерів) */
+    .shop-container {
+      background-color: #161b22;
+      border-top: 1px solid #30363d;
+      padding: 12px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .shop-title {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #8b949e;
+    }
+
+    .skins-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Фікс: flex-shrink: 0 запобігає звуженню елементів при збільшенні їх кількості */
+    .skin-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #21262d;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      flex-shrink: 0;
+    }
+
+    .skin-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .skin-preview {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+    }
+
+    /* Перемикач (Тумблер) */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 22px;
+      flex-shrink: 0; /* Фікс: тумблер не зменшується */
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #30363d;
+      transition: .3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #238636;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Модальні вікна (Налаштування та Політика) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      padding: 16px;
       position: relative;
     }
 
-    .clicker-coin:active {
-      transform: scale(0.92);
-    }
-
-    .btn-clicker-close {
-      background: #ff3333;
-      color: white;
-      border: none;
-      padding: 12px 30px;
-      font-weight: 800;
+    .modal-header {
       font-size: 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #c9d1d9;
     }
 
-    .rarity-consumer { background-color: #b0c3d9; }
-    .rarity-industrial { background-color: #5e98d9; }
-    .rarity-restricted { background-color: #8847ff; }
-    .rarity-classified { background-color: #d32ce6; }
-    .rarity-covert { background-color: #eb4b4b; }
-    .rarity-gold { background-color: #ffd700; }
+    .modal-body {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #8b949e;
+      margin-bottom: 16px;
+    }
+
+    .close-btn {
+      background-color: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      float: right;
+    }
+
+    .lang-select {
+      width: 100%;
+      padding: 8px;
+      background-color: #0d1117;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
   </style>
 </head>
 <body>
 
-  <div class="glow-bg"></div>
-
-  <header>
-    <div class="balance-badge" onclick="toggleModal('depositModal', true)">$ <span id="userBalance">10</span></div>
-    <div class="logo">SITRO <span>DROP</span></div>
-  </header>
-
-  <div class="app-container">
-    <div class="wheel-wrapper">
-      <div class="wheel-pointer"></div>
-      <canvas id="wheelCanvas" width="560" height="560"></canvas>
-    </div>
-
-    <button class="btn-reroll" id="rerollBtn" onclick="rerollWheelSkins()">Change Wheel Skins</button>
-
-    <div class="selected-slot-card">
-      <div class="slot-details">
-        <div class="title">Staked Skin</div>
-        <div class="name" id="slotName">Select Skin</div>
-      </div>
-      <div class="slot-price" id="slotPrice">$0</div>
-    </div>
-
-    <button class="btn-spin" id="spinBtn" onclick="spinWheel()">SPIN WHEEL</button>
-  </div>
-
-  <div class="bottom-bar">
-    <button class="btn-inventory" id="invOpenBtn" onclick="toggleModal('inventoryModal', true)">
-      INVENTORY (<span id="invCount">0</span>)
-    </button>
-    <a href="https://store.steampowered.com/tags/da/Inventarstyring/?l=russian&snr=1_5_9__409" target="_blank" class="btn-steam-link">
-      Add from Steam
-    </a>
-  </div>
-
-  <!-- Inventory & Shop Sheet Modal -->
-  <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
-    <div class="inventory-sheet" onclick="event.stopPropagation()">
-      <div class="sheet-header">
-        <div class="sheet-title">Storage & Market</div>
-        <button class="btn-close" onclick="toggleModal('inventoryModal', false)">&times;</button>
-      </div>
-
-      <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchTab('skins')">Skins</button>
-        <button class="tab-btn" onclick="switchTab('shop')">Shop</button>
-        <button class="tab-btn" onclick="switchTab('sale')">Sale</button>
-      </div>
-
-      <!-- SKINS TAB -->
-      <div class="tab-content active" id="tab-skins">
-        <div class="inventory-grid" id="inventoryGrid"></div>
-      </div>
-
-      <!-- SHOP TAB -->
-      <div class="tab-content" id="tab-shop">
-        <div class="shop-category-tabs">
-          <button class="shop-cat-btn active" onclick="switchShopCategory('all')">All</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('rifles')">Rifles</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('pistols')">Pistols</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('knives')">Knives</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('smg')">Heavy/SMG</button>
+  <!-- Верхня панель у стилі GitHub -->
+  <div class="header">
+    <div class="balance-display" id="balance">$0.00</div>
+    <div class="profile-container">
+      <div class="profile-avatar" onclick="toggleDropdown()">GH</div>
+      
+      <!-- Випадаюче меню -->
+      <div class="github-dropdown" id="githubDropdown">
+        <div class="dropdown-header">
+          Увійшли як: <span id="userNickname">Developer</span>
         </div>
-        <div class="inventory-grid" id="shopGrid"></div>
-      </div>
-
-      <!-- SALE TAB -->
-      <div class="tab-content" id="tab-sale">
-        <div class="inventory-grid" id="saleGrid"></div>
+        <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Налаштування</div>
+        <div class="dropdown-item" onclick="openModal('privacyModal')">📜 Приватна політика</div>
       </div>
     </div>
   </div>
 
-  <!-- Deposit Modal -->
-  <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
-    <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 60vh;">
-      <div class="sheet-header">
-        <div class="sheet-title">Top Up Balance</div>
-        <button class="btn-close" onclick="toggleModal('depositModal', false)">&times;</button>
+  <!-- Ігрова зона клікера -->
+  <div class="clicker-area" id="clickArea">
+    <div class="click-target" id="clickBtn">КЛІК</div>
+  </div>
+
+  <!-- Список скінів (з виправленими тумблерами) -->
+  <div class="shop-container">
+    <div class="shop-title">Скіни та Стилі</div>
+    <div class="skins-list">
+      
+      <div class="skin-card">
+        <div class="skin-info">
+          <div class="skin-preview" style="background: #ff5722;"></div>
+          <span>Класичний Помаранчевий</span>
+        </div>
+        <label class="switch">
+          <input type="radio" name="skin" checked onclick="applySkin('#ff5722')">
+          <span class="slider"></span>
+        </label>
       </div>
-      <div class="deposit-options">
-        <a href="https://www.visa.com" target="_blank" class="deposit-btn">
-          <span class="card-badge">💳</span> Visa
-        </a>
-        <a href="https://www.mastercard.com" target="_blank" class="deposit-btn">
-          <span class="card-badge">💳</span> Mastercard
-        </a>
-        <button class="deposit-btn" id="clickForMoneyBtn" style="display: none; background: rgba(255,215,0,0.15); border-color: #ffd700; color: #ffd700;" onclick="openClicker()">
-          💰 Click For money
-        </button>
-        <a href="https://example.com" target="_blank" class="deposit-btn">
-          More
-        </a>
+
+      <div class="skin-card">
+        <div class="skin-info">
+          <div class="skin-preview" style="background: #00bcd4;"></div>
+          <span>Неоновий Блакитний</span>
+        </div>
+        <label class="switch">
+          <input type="radio" name="skin" onclick="applySkin('#00bcd4')">
+          <span class="slider"></span>
+        </label>
       </div>
+
+      <div class="skin-card">
+        <div class="skin-info">
+          <div class="skin-preview" style="background: #e91e63;"></div>
+          <span>Кібер Рожевий</span>
+        </div>
+        <label class="switch">
+          <input type="radio" name="skin" onclick="applySkin('#e91e63')">
+          <span class="slider"></span>
+        </label>
+      </div>
+
     </div>
   </div>
 
-  <!-- TAPPER SCREEN -->
-  <div class="clicker-modal" id="clickerModal">
-    <div class="clicker-header">$<span id="clickerBalance">0</span></div>
-    <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
-    <button class="btn-clicker-close" onclick="closeClicker()">BACK TO GAME</button>
+  <!-- Модальне вікно: Налаштування -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-content">
+      <div class="modal-header">Налаштування</div>
+      <div class="modal-body">
+        <label for="lang">Оберіть мову інтерфейсу:</label>
+        <select id="lang" class="lang-select">
+          <option value="uk">Українська</option>
+          <option value="ru">Русский</option>
+          <option value="kk">Қазақша</option>
+        </select>
+      </div>
+      <button class="close-btn" onclick="closeModal('settingsModal')">Закрити</button>
+    </div>
   </div>
 
-  <div class="result-toast" id="resultToast">RESULTS</div>
+  <!-- Модальне вікно: Політика конфіденційності -->
+  <div class="modal-overlay" id="privacyModal">
+    <div class="modal-content">
+      <div class="modal-header">Приватна політика</div>
+      <div class="modal-body">
+        У разі нападу нігерів на нігерію ви підете на війну.
+      </div>
+      <button class="close-btn" onclick="closeModal('privacyModal')">Згоден / Закрити</button>
+    </div>
+  </div>
 
   <script>
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
+    let balance = 0.00;
+    const clickValue = 0.01; // 1 клік = 1 цент
 
-    const SKIN_POOL = [
-      // CHEAP SKINS ($0.50 - $5.00)
-      { id: 101, name: 'P250 | Sand Dune', price: 0.5, rarity: 'rarity-consumer', category: 'pistols' },
-      { id: 102, name: 'Glock-18 | High Beam', price: 0.8, rarity: 'rarity-industrial', category: 'pistols' },
-      { id: 103, name: 'USP-S | Forest Leaves', price: 1.0, rarity: 'rarity-industrial', category: 'pistols' },
-      { id: 104, name: 'MP7 | Groundwater', price: 1.2, rarity: 'rarity-consumer', category: 'smg' },
-      { id: 105, name: 'P90 | Sand Spray', price: 1.5, rarity: 'rarity-consumer', category: 'smg' },
-      { id: 106, name: 'AK-47 | Safari Mesh', price: 2.0, rarity: 'rarity-industrial', category: 'rifles' },
-      { id: 107, name: 'M4A4 | Magnesium', price: 2.5, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 108, name: 'AWM | Capillary', price: 3.0, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 109, name: 'Desert Eagle | Bronze Deco', price: 4.0, rarity: 'rarity-restricted', category: 'pistols' },
-      { id: 110, name: 'USP-S | Flashback', price: 5.0, rarity: 'rarity-restricted', category: 'pistols' },
+    const balanceEl = document.getElementById('balance');
+    const clickBtn = document.getElementById('clickBtn');
+    const clickArea = document.getElementById('clickArea');
 
-      // MID SKINS ($10 - $50)
-      { id: 201, name: 'Glock-18 | Water Elemental', price: 10, rarity: 'rarity-classified', category: 'pistols' },
-      { id: 202, name: 'M4A4 | Evil Daimyo', price: 12, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 203, name: 'AK-47 | Emerald Pinstripe', price: 15, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 204, name: 'MAC-10 | Neon Rider', price: 18, rarity: 'rarity-covert', category: 'smg' },
-      { id: 205, name: 'AWP | Atheris', price: 20, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 206, name: 'M4A1-S | Nitro', price: 25, rarity: 'rarity-restricted', category: 'rifles' },
-      { id: 207, name: 'AK-47 | Slate', price: 30, rarity: 'rarity-classified', category: 'rifles' },
-      { id: 208, name: 'USP-S | Cyrex', price: 35, rarity: 'rarity-classified', category: 'pistols' },
-      { id: 209, name: 'Desert Eagle | Mecha Industries', price: 40, rarity: 'rarity-classified', category: 'pistols' },
-      { id: 210, name: 'AWP | Acheron', price: 50, rarity: 'rarity-restricted', category: 'rifles' },
+    // Клік-механіка
+    clickBtn.addEventListener('click', (e) => {
+      balance += clickValue;
+      balanceEl.textContent = `$${balance.toFixed(2)}`;
 
-      // HIGH SKINS ($75 - $300)
-      { id: 301, name: 'M4A4 | Neo-Noir', price: 75, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 302, name: 'AK-47 | Redline', price: 100, rarity: 'rarity-classified', category: 'rifles' },
-      { id: 303, name: 'USP-S | Kill Confirmed', price: 120, rarity: 'rarity-covert', category: 'pistols' },
-      { id: 304, name: 'Desert Eagle | Printstream', price: 150, rarity: 'rarity-covert', category: 'pistols' },
-      { id: 305, name: 'AWP | Hyper Beast', price: 180, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 306, name: 'AWP | Asiimov', price: 200, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 307, name: 'M4A1-S | Player Two', price: 220, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 308, name: 'AK-47 | Vulcan', price: 250, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 309, name: 'AK-47 | Fuel Injector', price: 280, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 310, name: 'M4A1-S | Printstream', price: 300, rarity: 'rarity-covert', category: 'rifles' },
-
-      // KNIVES & LUXURY ($400 - $1500)
-      { id: 401, name: 'Navaja Knife | Forest DDPAT', price: 120, rarity: 'rarity-gold', category: 'knives' },
-      { id: 402, name: 'Gut Knife | Doppler', price: 180, rarity: 'rarity-gold', category: 'knives' },
-      { id: 403, name: 'Flip Knife | Tiger Tooth', price: 280, rarity: 'rarity-gold', category: 'knives' },
-      { id: 404, name: 'Huntsman Knife | Marble Fade', price: 350, rarity: 'rarity-gold', category: 'knives' },
-      { id: 405, name: 'AK-47 | Fire Serpent', price: 450, rarity: 'rarity-covert', category: 'rifles' },
-      { id: 406, name: 'M9 Bayonet | Slaughter', price: 600, rarity: 'rarity-gold', category: 'knives' },
-      { id: 407, name: 'Karambit | Doppler', price: 800, rarity: 'rarity-gold', category: 'knives' },
-      { id: 408, name: 'Butterfly Knife | Fade', price: 1200, rarity: 'rarity-gold', category: 'knives' },
-      { id: 409, name: 'AWP | Dragon Lore', price: 1500, rarity: 'rarity-covert', category: 'rifles' }
-    ];
-
-    let userBalance = 10;
-    let userInventory = [
-      { ...SKIN_POOL[0], instanceId: 1001 }
-    ];
-
-    let selectedSkin = userInventory[0];
-    let isSpinning = false;
-    let currentWheelSkins = [];
-    let currentRotation = 0;
-    let activeShopCategory = 'all';
-
-    const canvas = document.getElementById('wheelCanvas');
-    const ctx = canvas.getContext('2d');
-
-    function init() {
-      loadDataFromTelegram();
-      updateBalanceUI();
-      updateActiveSlotUI();
-      renderInventory();
-      renderShop();
-      renderSale();
-      generateWheelForSkin(selectedSkin);
-    }
-
-    function saveDataToTelegram() {
-      if (!tg?.CloudStorage) return;
-      const payload = {
-        balance: userBalance,
-        inventory: userInventory
-      };
-      tg.CloudStorage.setItem('sitro_drop_save', JSON.stringify(payload));
-    }
-
-    function loadDataFromTelegram() {
-      if (!tg?.CloudStorage) return;
-      tg.CloudStorage.getItem('sitro_drop_save', (err, value) => {
-        if (!err && value) {
-          try {
-            const data = JSON.parse(value);
-            if (data.balance !== undefined) userBalance = data.balance;
-            if (data.inventory && Array.isArray(data.inventory)) userInventory = data.inventory;
-
-            selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
-            updateBalanceUI();
-            updateActiveSlotUI();
-            renderInventory();
-            renderSale();
-            generateWheelForSkin(selectedSkin);
-          } catch(e) { console.error(e); }
-        }
-      });
-    }
-
-    function updateBalanceUI() {
-      document.getElementById('userBalance').innerText = userBalance;
-      document.getElementById('clickerBalance').innerText = userBalance;
+      // Виліт тексту +0.01$
+      const floatText = document.createElement('div');
+      floatText.className = 'floating-text';
+      floatText.textContent = `+$${clickValue.toFixed(2)}`;
       
-      const clickerBtn = document.getElementById('clickForMoneyBtn');
-      if (userBalance === 0) {
-        clickerBtn.style.display = 'flex';
-      } else {
-        clickerBtn.style.display = 'none';
+      const rect = clickArea.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      floatText.style.left = `${x}px`;
+      floatText.style.top = `${y}px`;
+
+      clickArea.appendChild(floatText);
+
+      setTimeout(() => {
+        floatText.remove();
+      }, 800);
+    });
+
+    // Перемикання випадаючого меню GitHub
+    function toggleDropdown() {
+      const dropdown = document.getElementById('githubDropdown');
+      dropdown.classList.toggle('active');
+    }
+
+    // Закриття меню при кліку поза ним
+    window.addEventListener('click', (e) => {
+      if (!e.target.closest('.profile-container')) {
+        document.getElementById('githubDropdown').classList.remove('active');
       }
+    });
+
+    // Управління модальними вікнами
+    function openModal(id) {
+      document.getElementById(id).classList.add('active');
+      document.getElementById('githubDropdown').classList.remove('active');
     }
 
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      if (tabName === 'skins') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('tab-skins').classList.add('active');
-      } else if (tabName === 'shop') {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('tab-shop').classList.add('active');
-        renderShop();
-      } else if (tabName === 'sale') {
-        document.querySelectorAll('.tab-btn')[2].classList.add('active');
-        document.getElementById('tab-sale').classList.add('active');
-        renderSale();
-      }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('active');
     }
 
-    function switchShopCategory(cat) {
-      activeShopCategory = cat;
-      document.querySelectorAll('.shop-cat-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      renderShop();
+    // Зміна скіна кнопки
+    function applySkin(color) {
+      clickBtn.style.background = color;
+      clickBtn.style.boxShadow = `0 0 20px ${color}`;
     }
-
-    function getRandomSkinInPriceRange(minPrice, maxPrice, fallbackSkin) {
-      const candidates = SKIN_POOL.filter(s => s.price >= minPrice && s.price <= maxPrice);
-      if (candidates.length === 0) return fallbackSkin;
-      return candidates[Math.floor(Math.random() * candidates.length)];
-    }
-
-    function generateWheelForSkin(skin) {
-      if (!skin) {
-        currentWheelSkins = [];
-        drawWheel(0);
-        return;
-      }
-
-      const p = skin.price;
-
-      // Picking 3 distinct target winning skins based on ratios
-      let win1 = getRandomSkinInPriceRange(p * 1.1, p * 1.6, skin);
-      let win2 = getRandomSkinInPriceRange(p * 1.7, p * 2.5, win1);
-      let win3 = getRandomSkinInPriceRange(p * 2.6, p * 5.0, win2);
-
-      const lossSector = { id: 0, name: 'SKIN LOST', price: 0, isLoss: true };
-
-      currentWheelSkins = [
-        lossSector,
-        win1,
-        lossSector,
-        win2,
-        lossSector,
-        win3
-      ];
-
-      drawWheel(currentRotation);
-    }
-
-    function rerollWheelSkins() {
-      if (isSpinning || !selectedSkin) return;
-      generateWheelForSkin(selectedSkin);
-      showToast('Wheel Skins Shuffled!');
-    }
-
-    function drawWheel(rotationAngle) {
-      const numSlices = 6;
-      const sliceAngle = (2 * Math.PI) / numSlices;
-      const radius = canvas.width / 2;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      ctx.translate(radius, radius);
-      ctx.rotate(rotationAngle);
-
-      for (let i = 0; i < numSlices; i++) {
-        const angle = i * sliceAngle;
-        const item = currentWheelSkins[i] || { name: 'Empty', isLoss: true };
-
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.arc(0, 0, radius - 10, angle, angle + sliceAngle);
-        ctx.closePath();
-        
-        ctx.fillStyle = item.isLoss ? '#1c0d0d' : '#112217';
-        ctx.fill();
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = '#0b0b0d';
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(0, 0, radius - 5, angle, angle + sliceAngle);
-        ctx.lineWidth = 6;
-        ctx.strokeStyle = item.isLoss ? '#ff3333' : '#00ff66';
-        ctx.stroke();
-
-        ctx.save();
-        ctx.rotate(angle + sliceAngle / 2);
-        ctx.textAlign = 'right';
-
-        if (item.isLoss) {
-          ctx.fillStyle = '#ff4444';
-          ctx.font = 'bold 20px Segoe UI';
-          ctx.fillText(item.name, radius - 35, 7);
-        } else {
-          ctx.fillStyle = '#00ff66';
-          ctx.font = 'bold 16px Segoe UI';
-          const displayName = item.name.length > 13 ? item.name.substring(0, 13) + '..' : item.name;
-          ctx.fillText(displayName, radius - 35, 7);
-        }
-
-        ctx.restore();
-      }
-
-      ctx.beginPath();
-      ctx.arc(0, 0, 42, 0, 2 * Math.PI);
-      ctx.fillStyle = '#121216';
-      ctx.fill();
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = '#ff7700';
-      ctx.stroke();
-
-      ctx.restore();
-    }
-
-    function spinWheel() {
-      if (isSpinning || !selectedSkin) return;
-
-      // Close all modals and lock inventory during spin
-      toggleModal('inventoryModal', false);
-      toggleModal('depositModal', false);
-
-      isSpinning = true;
-      document.getElementById('spinBtn').disabled = true;
-      document.getElementById('rerollBtn').disabled = true;
-      document.getElementById('invOpenBtn').disabled = true;
-
-      const stakedSkinRef = selectedSkin;
-
-      const numSlices = 6;
-      const sliceAngle = (2 * Math.PI) / numSlices;
-      const winningIndex = Math.floor(Math.random() * numSlices);
-      const outcome = currentWheelSkins[winningIndex];
-
-      const targetSliceCenter = (winningIndex * sliceAngle) + (sliceAngle / 2);
-      const randomRounds = 5 + Math.floor(Math.random() * 3);
-      const targetRotation = (randomRounds * 2 * Math.PI) + ((3 * Math.PI / 2) - targetSliceCenter);
-
-      const startTime = performance.now();
-      const spinDuration = 4000;
-
-      function animateSpin(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / spinDuration, 1);
-        const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentAngle = currentRotation + (targetRotation - currentRotation) * easeOut;
-
-        drawWheel(currentAngle);
-
-        if (progress < 1) {
-          requestAnimationFrame(animateSpin);
-        } else {
-          currentRotation = targetRotation % (2 * Math.PI);
-          isSpinning = false;
-
-          document.getElementById('spinBtn').disabled = false;
-          document.getElementById('rerollBtn').disabled = false;
-          document.getElementById('invOpenBtn').disabled = false;
-
-          const stakedIndex = userInventory.findIndex(i => i.instanceId === stakedSkinRef.instanceId);
-          if (stakedIndex !== -1) {
-            userInventory.splice(stakedIndex, 1);
-          }
-
-          if (outcome.isLoss) {
-            showToast('LOST: ' + stakedSkinRef.name);
-          } else {
-            userInventory.unshift({ ...outcome, instanceId: Date.now() });
-            showToast('WON: ' + outcome.name + '!');
-          }
-
-          selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
-
-          updateActiveSlotUI();
-          renderInventory();
-          renderSale();
-          generateWheelForSkin(selectedSkin);
-          saveDataToTelegram();
-        }
-      }
-
-      requestAnimationFrame(animateSpin);
-    }
-
-    function updateActiveSlotUI() {
-      if (!selectedSkin) {
-        document.getElementById('slotName').innerText = 'No Skin Selected';
-        document.getElementById('slotPrice').innerText = '$0';
-        document.getElementById('spinBtn').disabled = true;
-        return;
-      }
-      document.getElementById('slotName').innerText = selectedSkin.name;
-      document.getElementById('slotPrice').innerText = '$' + selectedSkin.price;
-      document.getElementById('spinBtn').disabled = false;
-      document.getElementById('invCount').innerText = userInventory.length;
-    }
-
-    function renderInventory() {
-      const grid = document.getElementById('inventoryGrid');
-      grid.innerHTML = '';
-
-      if (userInventory.length === 0) {
-        grid.innerHTML = '<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">Inventory is empty</div>';
-        return;
-      }
-
-      userInventory.forEach((skin) => {
-        const card = document.createElement('div');
-        card.className = 'item-card ' + (selectedSkin && selectedSkin.instanceId === skin.instanceId ? 'selected' : '');
-        card.onclick = () => selectSkinFromInventory(skin);
-
-        card.innerHTML = `
-          <div class="rarity-bar ${skin.rarity}"></div>
-          <div class="name">${skin.name}</div>
-          <div class="price">$${skin.price}</div>
-        `;
-        grid.appendChild(card);
-      });
-
-      document.getElementById('invCount').innerText = userInventory.length;
-    }
-
-    function renderShop() {
-      const grid = document.getElementById('shopGrid');
-      grid.innerHTML = '';
-
-      const filtered = activeShopCategory === 'all' 
-        ? SKIN_POOL 
-        : SKIN_POOL.filter(s => s.category === activeShopCategory);
-
-      filtered.forEach((skin) => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-
-        card.innerHTML = `
-          <div class="rarity-bar ${skin.rarity}"></div>
-          <div class="name">${skin.name}</div>
-          <div class="price">$${skin.price}</div>
-          <button class="btn-action-card" onclick="buySkin(event, ${skin.id})">Buy</button>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function buySkin(event, skinId) {
-      event.stopPropagation();
-      if (isSpinning) return;
-
-      const skinToBuy = SKIN_POOL.find(s => s.id === skinId);
-      if (!skinToBuy) return;
-
-      if (userBalance >= skinToBuy.price) {
-        userBalance = Number((userBalance - skinToBuy.price).toFixed(2));
-        updateBalanceUI();
-        userInventory.push({ ...skinToBuy, instanceId: Date.now() });
-        renderInventory();
-        renderSale();
-        saveDataToTelegram();
-        showToast('Bought ' + skinToBuy.name + '!');
-      } else {
-        showToast('Not enough balance!');
-      }
-    }
-
-    function renderSale() {
-      const grid = document.getElementById('saleGrid');
-      grid.innerHTML = '';
-
-      if (userInventory.length === 0) {
-        grid.innerHTML = '<div style="color:#888; font-size:13px; grid-column:span 2; text-align:center; padding:20px;">No skins to sell</div>';
-        return;
-      }
-
-      userInventory.forEach((skin) => {
-        const card = document.createElement('div');
-        card.className = 'item-card';
-
-        card.innerHTML = `
-          <div class="rarity-bar ${skin.rarity}"></div>
-          <div class="name">${skin.name}</div>
-          <div class="price">$${skin.price}</div>
-          <button class="btn-action-card" onclick="sellSkin(event, ${skin.instanceId})">Sell ($${skin.price})</button>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    function sellSkin(event, instanceId) {
-      event.stopPropagation();
-      if (isSpinning) return;
-
-      const index = userInventory.findIndex(i => i.instanceId === instanceId);
-      if (index === -1) return;
-
-      const soldSkin = userInventory[index];
-      userBalance = Number((userBalance + soldSkin.price).toFixed(2));
-      updateBalanceUI();
-      userInventory.splice(index, 1);
-
-      if (selectedSkin && selectedSkin.instanceId === instanceId) {
-        selectedSkin = userInventory.length > 0 ? userInventory[0] : null;
-        updateActiveSlotUI();
-        generateWheelForSkin(selectedSkin);
-      }
-
-      renderInventory();
-      renderSale();
-      saveDataToTelegram();
-      showToast('Sold ' + soldSkin.name + ' for $' + soldSkin.price);
-    }
-
-    function selectSkinFromInventory(skin) {
-      if (isSpinning) return;
-      selectedSkin = skin;
-      updateActiveSlotUI();
-      renderInventory();
-      generateWheelForSkin(selectedSkin);
-      toggleModal('inventoryModal', false);
-    }
-
-    function toggleModal(modalId, show) {
-      if (isSpinning && show) return;
-      const overlay = document.getElementById(modalId);
-      if (show) overlay.classList.add('active');
-      else overlay.classList.remove('active');
-    }
-
-    function openClicker() {
-      toggleModal('depositModal', false);
-      document.getElementById('clickerModal').classList.add('active');
-    }
-
-    function tapMoney(e) {
-      userBalance = Number((userBalance + 1).toFixed(2));
-      updateBalanceUI();
-      saveDataToTelegram();
-    }
-
-    function closeClicker() {
-      document.getElementById('clickerModal').classList.remove('active');
-    }
-
-    function showToast(text) {
-      const toast = document.getElementById('resultToast');
-      toast.innerText = text;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
-    init();
   </script>
 </body>
 </html>
