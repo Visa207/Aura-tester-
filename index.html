@@ -3,39 +3,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Mini App Clicker</title>
+  <title>Clicker Mini App</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --text-color: #c9d1d9;
+      --accent-orange: #ff5500;
+      --border-color: #30363d;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0d1117;
-      color: #c9d1d9;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #000000;
+      /* Фон у стилі ситро дроп (чорний з оранжевими крапками) */
+      background-image: radial-gradient(var(--accent-orange) 15%, transparent 16%);
+      background-size: 24px 24px;
+      color: var(--text-color);
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
+      align-items: center;
+      min-height: 100vh;
+      user-select: none;
     }
 
-    /* Верхня панель (GitHub Style Header) */
+    /* Верхня панель у стилі GitHub */
     .header {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 20px;
+      background-color: rgba(22, 27, 34, 0.95);
+      border-bottom: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 16px;
-      background-color: #161b22;
-      border-bottom: 1px solid #30363d;
-      position: relative;
-      z-index: 10;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(5px);
     }
 
     .balance-display {
-      font-size: 18px;
+      font-size: 1.2rem;
       font-weight: bold;
       color: #3fb950;
     }
@@ -44,33 +55,38 @@
       position: relative;
     }
 
-    .profile-avatar {
+    .profile-btn {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      border: 2px solid #30363d;
+      background-color: #30363d;
+      border: 2px solid var(--border-color);
       cursor: pointer;
-      background-color: #21262d;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      color: #58a6ff;
+    }
+
+    .profile-btn img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     /* Випадаюче меню GitHub */
     .github-dropdown {
       display: none;
       position: absolute;
-      top: 45px;
       right: 0;
-      width: 220px;
-      background-color: #161b22;
-      border: 1px solid #30363d;
+      top: 45px;
+      width: 240px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 6px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-      z-index: 100;
-      padding: 8px 0;
+      z-index: 101;
+      overflow: hidden;
     }
 
     .github-dropdown.active {
@@ -78,400 +94,348 @@
     }
 
     .dropdown-header {
-      padding: 8px 16px;
-      border-bottom: 1px solid #30363d;
-      font-size: 13px;
-      color: #8b949e;
+      padding: 12px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
     }
 
     .dropdown-header span {
       display: block;
       font-weight: bold;
-      color: #c9d1d9;
-      font-size: 14px;
+      color: #f0f6fc;
     }
 
     .dropdown-item {
-      padding: 8px 16px;
-      font-size: 14px;
-      color: #c9d1d9;
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      color: var(--text-color);
       cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
     }
 
     .dropdown-item:hover {
-      background-color: #1f6feb;
-      color: #ffffff;
-    }
-
-    .dropdown-divider {
-      height: 1px;
-      background-color: #30363d;
-      margin: 4px 0;
-    }
-
-    /* Зона клікера з помаранчевим фоном у цятку (Nitro Drop style) */
-    .clicker-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      background-color: #000000;
-      /* Генерація симетричного візерунку у помаранчеву цятку */
-      background-image: radial-gradient(#ff4500 20%, transparent 20%), radial-gradient(#ff4500 20%, transparent 20%);
-      background-position: 0 0, 15px 15px;
-      background-size: 30px 30px;
-    }
-
-    .click-target {
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #ff5722, #e64a19);
-      border: 4px solid #ffffff;
-      box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.05s ease;
-      touch-action: manipulation;
-    }
-
-    .click-target:active {
-      transform: scale(0.93);
-    }
-
-    /* Анімація вилітаючих цифр */
-    .floating-text {
-      position: absolute;
-      color: #2ecc71;
-      font-weight: bold;
-      font-size: 20px;
-      pointer-events: none;
-      animation: floatUp 0.8s ease-out forwards;
-    }
-
-    @keyframes floatUp {
-      0% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-50px);
-      }
-    }
-
-    /* Список скінів / Магазин (З виправленням стискання тумблерів) */
-    .shop-container {
-      background-color: #161b22;
-      border-top: 1px solid #30363d;
-      padding: 12px;
-      max-height: 220px;
-      overflow-y: auto;
-    }
-
-    .shop-title {
-      font-size: 14px;
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: #8b949e;
-    }
-
-    .skins-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    /* Фікс: flex-shrink: 0 запобігає звуженню елементів при збільшенні їх кількості */
-    .skin-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background-color: #21262d;
-      padding: 10px;
-      border-radius: 6px;
-      border: 1px solid #30363d;
-      flex-shrink: 0;
-    }
-
-    .skin-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .skin-preview {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-    }
-
-    /* Перемикач (Тумблер) */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 22px;
-      flex-shrink: 0; /* Фікс: тумблер не зменшується */
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #30363d;
-      transition: .3s;
-      border-radius: 22px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: #238636;
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(22px);
+      background-color: #1f242c;
     }
 
     /* Модальні вікна (Налаштування та Політика) */
-    .modal-overlay {
+    .modal {
       display: none;
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.7);
       z-index: 200;
-      align-items: center;
       justify-content: center;
-    }
-
-    .modal-overlay.active {
-      display: flex;
+      align-items: center;
     }
 
     .modal-content {
-      background-color: #161b22;
-      border: 1px solid #30363d;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 20px;
       border-radius: 8px;
-      width: 90%;
-      max-width: 400px;
-      padding: 16px;
-      position: relative;
+      max-width: 320px;
+      width: 85%;
     }
 
-    .modal-header {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 12px;
-      color: #c9d1d9;
-    }
-
-    .modal-body {
-      font-size: 14px;
-      line-height: 1.5;
-      color: #8b949e;
-      margin-bottom: 16px;
+    .modal-content h3 {
+      margin-top: 0;
     }
 
     .close-btn {
-      background-color: #21262d;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
-      padding: 6px 12px;
-      border-radius: 6px;
+      margin-top: 15px;
+      background: var(--accent-orange);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
       cursor: pointer;
-      float: right;
+      width: 100%;
     }
 
-    .lang-select {
+    /* Основний контейнер гри */
+    .game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
       width: 100%;
-      padding: 8px;
-      background-color: #0d1117;
-      color: #c9d1d9;
-      border: 1px solid #30363d;
+      max-width: 400px;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    /* Зона клікера */
+    .click-area {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #222 0%, #111 100%);
+      border: 4px solid var(--accent-orange);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(255, 85, 0, 0.4);
+      transition: transform 0.05s ease;
+      margin: 20px 0;
+    }
+
+    .click-area:active {
+      transform: scale(0.95);
+    }
+
+    .click-skin-img {
+      max-width: 70%;
+      max-height: 70%;
+      pointer-events: none;
+    }
+
+    /* Секція перемикачів скінів (Сітка по 2 в ряд) */
+    .skins-section {
+      width: 100%;
+      background-color: rgba(22, 27, 34, 0.9);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    .skins-title {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Фікс: сітка по 2 кнопки/тумблери в ряд з можливістю скролу */
+    .skins-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      max-height: 180px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .skin-card {
+      background: #0d1117;
+      border: 1px solid var(--border-color);
       border-radius: 6px;
-      margin-top: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .skin-card span {
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .toggle-btn {
+      background-color: #21262d;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      width: 100%;
+      transition: background 0.2s;
+    }
+
+    .toggle-btn.active {
+      background-color: var(--accent-orange);
+      color: #fff;
+      border-color: var(--accent-orange);
     }
   </style>
 </head>
 <body>
 
-  <!-- Верхня панель у стилі GitHub -->
+  <!-- Верхня панель (Header) -->
   <div class="header">
-    <div class="balance-display" id="balance">$0.00</div>
+    <div class="balance-display" id="balanceDisplay">$0.00</div>
+    
     <div class="profile-container">
-      <div class="profile-avatar" onclick="toggleDropdown()">GH</div>
-      
-      <!-- Випадаюче меню -->
+      <div class="profile-btn" onclick="toggleDropdown()">
+        <!-- Аватар профілю -->
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="Profile" id="profileAvatar">
+      </div>
+
+      <!-- Меню GitHub -->
       <div class="github-dropdown" id="githubDropdown">
         <div class="dropdown-header">
-          Увійшли як: <span id="userNickname">Developer</span>
+          Увійшов як <span id="userNickname">User_Dev</span>
         </div>
-        <div class="dropdown-item" onclick="openModal('settingsModal')">⚙️ Налаштування</div>
-        <div class="dropdown-item" onclick="openModal('privacyModal')">📜 Приватна політика</div>
+        <div class="dropdown-item" onclick="openModal('settingsModal')">
+          ⚙️ Налаштування
+        </div>
+        <div class="dropdown-item" onclick="openModal('privacyModal')">
+          📜 Приватна політика
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Ігрова зона клікера -->
-  <div class="clicker-area" id="clickArea">
-    <div class="click-target" id="clickBtn">КЛІК</div>
-  </div>
+  <!-- Ігровий контейнер -->
+  <div class="game-container">
+    <div class="click-area" onclick="handleTap(event)">
+      <div id="currentSkinDisplay" style="font-size: 3rem;">🍊</div>
+    </div>
 
-  <!-- Список скінів (з виправленими тумблерами) -->
-  <div class="shop-container">
-    <div class="shop-title">Скіни та Стилі</div>
-    <div class="skins-list">
-      
-      <div class="skin-card">
-        <div class="skin-info">
-          <div class="skin-preview" style="background: #ff5722;"></div>
-          <span>Класичний Помаранчевий</span>
-        </div>
-        <label class="switch">
-          <input type="radio" name="skin" checked onclick="applySkin('#ff5722')">
-          <span class="slider"></span>
-        </label>
+    <!-- Вибір скінів (Сітка 2 в ряд) -->
+    <div class="skins-section">
+      <div class="skins-title" id="skinsTitleText">Вибір скінів</div>
+      <div class="skins-grid" id="skinsGrid">
+        <!-- Скіни генеруються автоматично скриптом без зміни логіки -->
       </div>
-
-      <div class="skin-card">
-        <div class="skin-info">
-          <div class="skin-preview" style="background: #00bcd4;"></div>
-          <span>Неоновий Блакитний</span>
-        </div>
-        <label class="switch">
-          <input type="radio" name="skin" onclick="applySkin('#00bcd4')">
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="skin-card">
-        <div class="skin-info">
-          <div class="skin-preview" style="background: #e91e63;"></div>
-          <span>Кібер Рожевий</span>
-        </div>
-        <label class="switch">
-          <input type="radio" name="skin" onclick="applySkin('#e91e63')">
-          <span class="slider"></span>
-        </label>
-      </div>
-
     </div>
   </div>
 
   <!-- Модальне вікно: Налаштування -->
-  <div class="modal-overlay" id="settingsModal">
+  <div class="modal" id="settingsModal">
     <div class="modal-content">
-      <div class="modal-header">Налаштування</div>
-      <div class="modal-body">
-        <label for="lang">Оберіть мову інтерфейсу:</label>
-        <select id="lang" class="lang-select">
-          <option value="uk">Українська</option>
-          <option value="ru">Русский</option>
-          <option value="kk">Қазақша</option>
-        </select>
-      </div>
+      <h3 id="settingsTitle">Налаштування</h3>
+      <label for="langSelect" id="langLabel">Мова / Language:</label>
+      <select id="langSelect" onchange="changeLanguage(this.value)" style="width: 100%; padding: 8px; margin-top: 8px; background: #0d1117; color: white; border: 1px solid #30363d; border-radius: 4px;">
+        <option value="uk">Українська</option>
+        <option value="ru">Русский</option>
+        <option value="kk">Қазақша</option>
+      </select>
       <button class="close-btn" onclick="closeModal('settingsModal')">Закрити</button>
     </div>
   </div>
 
-  <!-- Модальне вікно: Політика конфіденційності -->
-  <div class="modal-overlay" id="privacyModal">
+  <!-- Модальне вікно: Приватна політика -->
+  <div class="modal" id="privacyModal">
     <div class="modal-content">
-      <div class="modal-header">Приватна політика</div>
-      <div class="modal-body">
+      <h3 id="privacyTitle">Приватна політика</h3>
+      <p id="privacyText" style="font-size: 0.85rem; line-height: 1.4;">
         У разі нападу нігерів на нігерію ви підете на війну.
-      </div>
-      <button class="close-btn" onclick="closeModal('privacyModal')">Згоден / Закрити</button>
+      </p>
+      <button class="close-btn" onclick="closeModal('privacyModal')">Зрозуміло</button>
     </div>
   </div>
 
   <script>
+    // Основні змінні
     let balance = 0.00;
-    const clickValue = 0.01; // 1 клік = 1 цент
+    const tapReward = 0.01; // 1 тап = 1 цент ($0.01)
 
-    const balanceEl = document.getElementById('balance');
-    const clickBtn = document.getElementById('clickBtn');
-    const clickArea = document.getElementById('clickArea');
+    // Список скінів (збережено та розширено без зміни механіки)
+    const skins = [
+      { id: 1, name: 'Citro Drop', icon: '🍊' },
+      { id: 2, name: 'Classic Coin', icon: '🪙' },
+      { id: 3, name: 'Diamond Drop', icon: '💎' },
+      { id: 4, name: 'Fire Energy', icon: '🔥' },
+      { id: 5, name: 'Star Power', icon: '⭐' },
+      { id: 6, name: 'Rocket Boost', icon: '🚀' }
+    ];
 
-    // Клік-механіка
-    clickBtn.addEventListener('click', (e) => {
-      balance += clickValue;
-      balanceEl.textContent = `$${balance.toFixed(2)}`;
+    let activeSkinId = 1;
 
-      // Виліт тексту +0.01$
-      const floatText = document.createElement('div');
-      floatText.className = 'floating-text';
-      floatText.textContent = `+$${clickValue.toFixed(2)}`;
+    // Ініціалізація
+    function initSkins() {
+      const grid = document.getElementById('skinsGrid');
+      grid.innerHTML = '';
       
-      const rect = clickArea.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      skins.forEach(skin => {
+        const card = document.createElement('div');
+        card.className = 'skin-card';
+        card.innerHTML = `
+          <span>${skin.icon} ${skin.name}</span>
+          <button class="toggle-btn ${skin.id === activeSkinId ? 'active' : ''}" onclick="selectSkin(${skin.id})">
+            ${skin.id === activeSkinId ? 'Увімкнено' : 'Увімкнути'}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-      floatText.style.left = `${x}px`;
-      floatText.style.top = `${y}px`;
+    function selectSkin(id) {
+      activeSkinId = id;
+      const selected = skins.find(s => s.id === id);
+      document.getElementById('currentSkinDisplay').innerText = selected.icon;
+      initSkins();
+    }
 
-      clickArea.appendChild(floatText);
+    // Механіка тапу
+    function handleTap(e) {
+      balance += tapReward;
+      document.getElementById('balanceDisplay').innerText = `$${balance.toFixed(2)}`;
+    }
 
-      setTimeout(() => {
-        floatText.remove();
-      }, 800);
-    });
-
-    // Перемикання випадаючого меню GitHub
+    // Меню профілю та модалки
     function toggleDropdown() {
       const dropdown = document.getElementById('githubDropdown');
       dropdown.classList.toggle('active');
     }
 
-    // Закриття меню при кліку поза ним
-    window.addEventListener('click', (e) => {
-      if (!e.target.closest('.profile-container')) {
-        document.getElementById('githubDropdown').classList.remove('active');
-      }
-    });
-
-    // Управління модальними вікнами
     function openModal(id) {
-      document.getElementById(id).classList.add('active');
+      document.getElementById(id).style.display = 'flex';
       document.getElementById('githubDropdown').classList.remove('active');
     }
 
     function closeModal(id) {
-      document.getElementById(id).classList.remove('active');
+      document.getElementById(id).style.display = 'none';
     }
 
-    // Зміна скіна кнопки
-    function applySkin(color) {
-      clickBtn.style.background = color;
-      clickBtn.style.boxShadow = `0 0 20px ${color}`;
+    // Закриття випадаючого меню при кліку поза ним
+    window.onclick = function(event) {
+      if (!event.target.closest('.profile-container')) {
+        const dropdown = document.getElementById('githubDropdown');
+        if (dropdown && dropdown.classList.contains('active')) {
+          dropdown.classList.remove('active');
+        }
+      }
     }
+
+    // Переклад мов
+    const translations = {
+      uk: {
+        skinsTitle: "Вибір скінів",
+        settings: "Налаштування",
+        privacy: "Приватна політика",
+        langLabel: "Мова / Language:"
+      },
+      ru: {
+        skinsTitle: "Выбор скинов",
+        settings: "Настройки",
+        privacy: "Политика конфиденциальности",
+        langLabel: "Язык / Language:"
+      },
+      kk: {
+        skinsTitle: "Скиндерді таңдау",
+        settings: "Баптаулар",
+        privacy: "Купиялылық саясаты",
+        langLabel: "Тіл / Language:"
+      }
+    };
+
+    function changeLanguage(lang) {
+      const t = translations[lang] || translations.uk;
+      document.getElementById('skinsTitleText').innerText = t.skinsTitle;
+      document.getElementById('settingsTitle').innerText = t.settings;
+      document.getElementById('privacyTitle').innerText = t.privacy;
+      document.getElementById('langLabel').innerText = t.langLabel;
+    }
+
+    // Запуск
+    initSkins();
   </script>
 </body>
 </html>
