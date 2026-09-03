@@ -319,7 +319,7 @@
       cursor: pointer;
     }
 
-    /* ФІКСОВАНИЙ РОЗМІР ТУМБЛЕРІВ ТА ВКТАДОК */
+    /* ФІКС ТУМБЛЕРІВ ТА ВКТАДОК */
     .nav-tabs, .shop-category-tabs {
       display: flex;
       gap: 8px;
@@ -331,6 +331,7 @@
       overflow-x: auto;
       white-space: nowrap;
       -webkit-overflow-scrolling: touch;
+      flex-shrink: 0; /* Контейнер не стискається */
     }
 
     .nav-tabs::-webkit-scrollbar, .shop-category-tabs::-webkit-scrollbar {
@@ -338,7 +339,8 @@
     }
 
     .tab-btn, .shop-cat-btn {
-      flex-shrink: 0; /* ГАРАНТІЯ ЩО ТУМБЛЕРИ НЕ ЗМЕНШАТЬСЯ */
+      flex-shrink: 0 !important; /* КНОПКИ ТУМБЛЕРІВ НІКОЛИ НЕ СТИСКАЮТЬСЯ */
+      min-width: max-content;
       background: transparent;
       border: none;
       color: #888888;
@@ -500,7 +502,7 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* TAPPER SCREEN WITH POLKA DOTS */
+    /* TAPPER SCREEN */
     .clicker-modal {
       position: fixed;
       top: 0;
@@ -611,7 +613,6 @@
     </a>
   </div>
 
-  <!-- Inventory & Shop Sheet Modal -->
   <div class="modal-overlay" id="inventoryModal" onclick="toggleModal('inventoryModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()">
       <div class="sheet-header">
@@ -625,31 +626,27 @@
         <button class="tab-btn" onclick="switchTab('sale')">Sale</button>
       </div>
 
-      <!-- SKINS TAB -->
       <div class="tab-content active" id="tab-skins">
         <div class="inventory-grid" id="inventoryGrid"></div>
       </div>
 
-      <!-- SHOP TAB -->
       <div class="tab-content" id="tab-shop">
         <div class="shop-category-tabs">
-          <button class="shop-cat-btn active" onclick="switchShopCategory('all')">All</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('rifles')">Rifles</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('pistols')">Pistols</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('knives')">Knives</button>
-          <button class="shop-cat-btn" onclick="switchShopCategory('smg')">Heavy/SMG</button>
+          <button class="shop-cat-btn active" onclick="switchShopCategory('all', event)">All</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory('rifles', event)">Rifles</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory('pistols', event)">Pistols</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory('knives', event)">Knives</button>
+          <button class="shop-cat-btn" onclick="switchShopCategory('smg', event)">Heavy/SMG</button>
         </div>
         <div class="inventory-grid" id="shopGrid"></div>
       </div>
 
-      <!-- SALE TAB -->
       <div class="tab-content" id="tab-sale">
         <div class="inventory-grid" id="saleGrid"></div>
       </div>
     </div>
   </div>
 
-  <!-- Deposit Modal -->
   <div class="modal-overlay" id="depositModal" onclick="toggleModal('depositModal', false)">
     <div class="inventory-sheet" onclick="event.stopPropagation()" style="height: auto; max-height: 60vh;">
       <div class="sheet-header">
@@ -673,7 +670,6 @@
     </div>
   </div>
 
-  <!-- TAPPER SCREEN -->
   <div class="clicker-modal" id="clickerModal">
     <div class="clicker-header">$<span id="clickerBalance">0</span></div>
     <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
@@ -689,7 +685,6 @@
       tg.expand();
     }
 
-    // ТІ САМІ ОРИГІНАЛЬНІ 39 СКІНІВ SITRO DROP
     const SKIN_POOL = [
       // CHEAP SKINS ($0.50 - $5.00)
       { id: 101, name: 'P250 | Sand Dune', price: 0.5, rarity: 'rarity-consumer', category: 'pistols' },
@@ -822,11 +817,11 @@
       }
     }
 
-    function switchShopCategory(cat) {
+    function switchShopCategory(cat, evt) {
       activeShopCategory = cat;
       document.querySelectorAll('.shop-cat-btn').forEach(btn => btn.classList.remove('active'));
-      if (event && event.target) {
-        event.target.classList.add('active');
+      if (evt && evt.target) {
+        evt.target.classList.add('active');
       }
       renderShop();
     }
