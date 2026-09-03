@@ -708,7 +708,7 @@
 
   <div class="clicker-modal" id="clickerModal">
     <div class="clicker-header">$<span id="clickerBalance">0</span></div>
-    <div class="clicker-coin" onclick="tapMoney(event)">💵</div>
+    <div class="clicker-coin" onclick="tapMoney(event)"> </div>
     <button class="btn-clicker-close" onclick="closeClicker()">BACK TO GAME</button>
   </div>
 
@@ -1209,7 +1209,7 @@
     }
 
     function tapMoney(e) {
-      userBalance = Number((userBalance + 1).toFixed(2));
+      userBalance = Number((userBalance + 0.1).toFixed(2));
       updateBalanceUI();
       saveDataToTelegram();
     }
